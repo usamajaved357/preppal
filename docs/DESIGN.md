@@ -29,13 +29,22 @@ countdown). Real photography only — no illustrations.
 - Product card: photo 216 px (hover zoom), badge pill top-left, Fraunces name, one-line description, price +
   "Add" outline pill (fills green on hover), delivery line with truck icon.
 - Category tile: 132–148 px circular photo + name + one-line sub.
-- Hero: copy left on forest; right half full-bleed crossfading slideshow (5 s, Ken Burns), gradient blend into
-  green, caption pill + dots. Live cutoff countdown under CTAs.
+- Hero: copy left on forest; right half full-bleed slideshow — 8 Unsplash photos (`HERO_SLIDES` in lib/site.ts,
+  loaded from images.unsplash.com with srcset), 3.5 s per photo, 0.8 s crossfade, a different camera move per photo,
+  story-style progress bars, 01/08 counter, prev/next, swipe; only prev/current/next mounted. Live cutoff countdown.
 - Feature row: 400 px rounded photo with two white label pills + kicker/heading/body.
-- Motion: rise-in on hero, hover lifts on cards, slideshow. Respect `prefers-reduced-motion`.
+- Motion: hero copy cascades in (`.hero-stagger`); sections, cards, tiles and steps fade/slide in on scroll via
+  `<Reveal delay from>` (`components/Reveal.tsx`, CSS `.reveal` in styles.css); card hover lift + image zoom + "View
+  details" chip; Add button pops to "✓ Added", cart count bumps, bottom toast "X added · View cart"; feature chips
+  float; WhatsApp button pulses. Header hides on scroll down and returns on scroll up (stays while focused).
+  Everything is disabled under `prefers-reduced-motion`.
+- Copy that depends on admin settings (cutoff, delivery time, city, min order, pause) comes from `useStoreInfo()` —
+  never hard-code "11 PM", "5 PM" or "Sahiwal".
 
 ## Imagery
 - `public/images/products/*` — cropped from Preppal's Instagram posts (replace with original photos).
+- Hero photos: Unsplash CDN (free Unsplash License, no attribution needed). To self-host later, save at 2000px
+  and swap the URLs in `HERO_SLIDES`.
 - `public/images/site/*` — Unsplash (free licence): chopping, karahi, mortar, spread, onions, spices, grill, thali.
 - Logo: `public/images/logo.png` (from Instagram profile; get the vector original).
 

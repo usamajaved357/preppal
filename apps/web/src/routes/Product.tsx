@@ -6,11 +6,15 @@ import { IconCash, IconTruck } from '../components/icons';
 import { q } from '../lib/api';
 import { useCart } from '../lib/cart';
 import { badgeClass } from '../lib/site';
+import { useStoreInfo } from '../lib/store-info';
+import { useToast } from '../lib/toast';
 
 export function ProductPage() {
   const { slug } = useParams({ from: '/p/$slug' });
   const { data: p, isLoading, isError } = useQuery(q.product(slug));
   const add = useCart((s) => s.add);
+  const showToast = useToast((t) => t.show);
+  const info = useStoreInfo();
   const [variantId, setVariantId] = useState<string>();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -43,8 +47,15 @@ export function ProductPage() {
       </nav>
       <div className="flex flex-wrap items-start gap-12">
         <div className="flex flex-[1_1_520px] flex-col gap-3">
-          <div className="h-[460px] overflow-hidden rounded-3xl bg-sand md:h-[520px]">
-            {images[image] && <img src={images[image]} alt={p.name} className="h-full w-full object-cover" />}
+          <div className="group h-[460px] overflow-hidden rounded-3xl bg-sand shadow-[0_24px_48px_-24px_rgba(22,58,44,.35)] md:h-[520px]">
+            {images[image] && (
+              <img
+                key={images[image]}
+                src={images[image]}
+                alt={p.name}
+                className="h-full w-full animate-rise object-cover transition duration-[1200ms] ease-out group-hover:scale-105"
+              />
+            )}
           </div>
           {images.length > 1 && (
             <div className="grid grid-cols-4 gap-3">
@@ -54,7 +65,7 @@ export function ProductPage() {
                   type="button"
                   onClick={() => setImage(i)}
                   aria-label={`Image ${i + 1}`}
-                  className={`h-24 overflow-hidden rounded-2xl ${i === image ? 'ring-2 ring-forest' : ''}`}
+                  className={`h-24 overflow-hidden rounded-2xl ring-offset-2 ring-offset-cream transition hover:-translate-y-0.5 ${i === image ? 'ring-2 ring-forest' : 'opacity-80 hover:opacity-100'}`}
                 >
                   <img src={src} alt="" className="h-full w-full object-cover" />
                 </button>
@@ -63,7 +74,7 @@ export function ProductPage() {
           )}
         </div>
 
-        <div className="flex flex-[1_1_400px] flex-col gap-5">
+        <div className="hero-stagger flex flex-[1_1_400px] flex-col gap-5">
           {p.badge && (
             <span
               className={`self-start rounded-full px-3 py-1 text-xs font-semibold ${badgeClass(p.badge)}`}
@@ -90,7 +101,7 @@ export function ProductPage() {
                 {p.variants.map((v) => (
                   <label
                     key={v.id}
-                    className={`flex h-12 cursor-pointer items-center gap-2 rounded-xl border px-4 font-semibold ${
+                    className={`flex h-12 cursor-pointer items-center gap-2 rounded-full border px-5 font-semibold transition active:scale-95 ${
                       v.id === variantId ? 'border-2 border-forest bg-sage-soft' : 'border-[#DDD6C7] bg-white'
                     } ${v.available ? '' : 'cursor-not-allowed opacity-50'}`}
                   >
@@ -146,10 +157,11 @@ export function ProductPage() {
                   qty,
                 );
                 setAdded(true);
+                showToast(`${qty} × ${p.name} added`);
               }}
-              className="h-[54px] flex-[1_1_220px] rounded-full bg-forest font-bold text-white disabled:opacity-50"
+              className="h-[54px] flex-[1_1_220px] rounded-full bg-forest font-bold text-white shadow-[0_12px_28px_-12px_rgba(31,77,58,.7)] transition hover:-translate-y-0.5 hover:bg-forest-deep active:scale-[.98] disabled:opacity-50"
             >
-              {added ? 'Added ✓ — add more' : 'Add to cart'}
+              {added ? <span className="inline-block animate-pop">Added ✓ — add more</span> : 'Add to cart'}
             </button>
           </div>
           {added && (
@@ -162,13 +174,13 @@ export function ProductPage() {
             <div className="flex items-center gap-2.5">
               <IconTruck className="text-forest" />{' '}
               <span>
-                <strong>Delivered tomorrow by 5 PM</strong> — order before 11 PM tonight
+                <strong>Delivered tomorrow by {info.by}</strong> — order before {info.cutoff} tonight
               </span>
             </div>
             <div className="flex items-center gap-2.5">
               <IconCash className="text-forest" />{' '}
               <span>
-                <strong>Cash on delivery</strong> — Sahiwal only, for now
+                <strong>Cash on delivery</strong> — delivering in {info.city}
               </span>
             </div>
           </div>

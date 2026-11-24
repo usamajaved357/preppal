@@ -71,6 +71,8 @@ export function CheckoutPage() {
   };
   const err = place.error instanceof ApiError ? place.error : null;
   const paused = !!settings.data?.ordersPaused;
+  const minOrder = settings.data?.minOrderPkr ?? 0;
+  const short = Math.max(0, minOrder - subtotal);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
@@ -249,10 +251,16 @@ export function CheckoutPage() {
           )}
           <button
             type="submit"
-            disabled={place.isPending || paused}
-            className="h-[58px] rounded-full bg-forest text-[17px] font-bold text-white disabled:opacity-60"
+            disabled={place.isPending || paused || short > 0}
+            className="h-[58px] rounded-full bg-forest text-[17px] font-bold text-white shadow-[0_12px_28px_-12px_rgba(31,77,58,.7)] transition hover:-translate-y-0.5 hover:bg-forest-deep active:scale-[.98] disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
           >
-            {paused ? 'Ordering paused' : place.isPending ? 'Placing order…' : 'Place order'}
+            {paused
+              ? 'Ordering paused'
+              : short > 0
+                ? `Add ${formatPkr(short)} more`
+                : place.isPending
+                  ? 'Placing order…'
+                  : 'Place order'}
           </button>
           <p className="rounded-[14px] bg-[#F7EFE4] p-3.5 text-sm leading-relaxed text-[#5A3A14]">
             We take orders a night ahead because we only sell fresh. We'll confirm on WhatsApp.

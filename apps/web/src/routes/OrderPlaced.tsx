@@ -1,16 +1,18 @@
 import { formatDeliveryDate, formatPkr, type OrderCreatedDto } from '@preppal/shared';
 import { Link, useParams } from '@tanstack/react-router';
 import { IconCheck, IconWhatsApp } from '../components/icons';
+import { useStoreInfo } from '../lib/store-info';
 
 export function OrderPlacedPage() {
   const { number } = useParams({ from: '/order/$number' });
   const raw = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(`order:${number}`) : null;
   const order = raw ? (JSON.parse(raw) as OrderCreatedDto) : null;
+  const { by } = useStoreInfo();
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-5 px-6 py-16">
       <div className="flex flex-col items-center gap-3 text-center">
-        <span className="grid h-20 w-20 place-items-center rounded-full bg-sage-soft text-forest">
+        <span className="relative grid h-20 w-20 animate-pop place-items-center rounded-full bg-sage-soft text-forest before:absolute before:inset-0 before:animate-ping before:rounded-full before:bg-sage/50 before:[animation-iteration-count:2] [&>svg]:relative">
           <IconCheck width={38} height={38} />
         </span>
         <h1 className="text-[34px] font-semibold">Shukriya! Order placed.</h1>
@@ -18,7 +20,7 @@ export function OrderPlacedPage() {
       </div>
       <div className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5">
         <Row k="Order no." v={number} />
-        {order && <Row k="Delivery" v={`${formatDeliveryDate(order.deliveryDate)} · by 5 PM`} />}
+        {order && <Row k="Delivery" v={`${formatDeliveryDate(order.deliveryDate)} · by ${by}`} />}
         {order && <Row k="Pay on delivery" v={formatPkr(order.totalPkr)} strong />}
       </div>
       {order && (

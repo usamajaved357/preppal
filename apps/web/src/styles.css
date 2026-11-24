@@ -19,7 +19,9 @@
   --font-sans: "DM Sans", system-ui, sans-serif;
 
   --animate-rise: rise 0.7s ease both;
-  --animate-kenburns: kenburns 9s ease-in-out infinite alternate;
+  --animate-pop: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  --animate-toast: toast-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  --animate-float: float 6s ease-in-out infinite;
 
   @keyframes rise {
     from {
@@ -31,12 +33,30 @@
       transform: none;
     }
   }
-  @keyframes kenburns {
-    from {
-      transform: scale(1.02);
+  @keyframes pop {
+    0% {
+      transform: scale(0.85);
     }
-    to {
+    60% {
       transform: scale(1.12);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.96);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
     }
   }
 }
@@ -62,7 +82,125 @@
   }
 }
 
+/* Scroll reveal (components/Reveal.tsx). --d staggers items in a list. */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms),
+    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms);
+  will-change: opacity, transform;
+}
+.reveal[data-from="left"] {
+  transform: translate3d(-40px, 0, 0);
+}
+.reveal[data-from="right"] {
+  transform: translate3d(40px, 0, 0);
+}
+.reveal[data-from="scale"] {
+  transform: scale(0.94);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hero slideshow: each photo gets its own camera move, restarted every time it becomes active. */
+@keyframes kb-in {
+  from {
+    transform: scale(1.18) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+}
+@keyframes kb-out {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.16);
+  }
+}
+@keyframes kb-left {
+  from {
+    transform: scale(1.14) translate3d(3%, 0, 0);
+  }
+  to {
+    transform: scale(1.14) translate3d(-3%, 0, 0);
+  }
+}
+@keyframes kb-right {
+  from {
+    transform: scale(1.14) translate3d(-3%, 1%, 0);
+  }
+  to {
+    transform: scale(1.14) translate3d(3%, -1%, 0);
+  }
+}
+@keyframes slide-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes caption-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(4px);
+  }
+}
+.kb-in {
+  animation: kb-in var(--kb, 5s) cubic-bezier(0.25, 0.6, 0.3, 1) both;
+}
+.kb-out {
+  animation: kb-out var(--kb, 5s) ease-out both;
+}
+.kb-left {
+  animation: kb-left var(--kb, 5s) ease-in-out both;
+}
+.kb-right {
+  animation: kb-right var(--kb, 5s) ease-in-out both;
+}
+.slide-progress {
+  transform-origin: left;
+  animation: slide-progress var(--dur, 3.5s) linear both;
+}
+.caption-in {
+  animation: caption-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Hero copy enters in a short cascade. (Top-level keyframes so they're always emitted.) */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+.hero-stagger > * {
+  animation: hero-rise 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.hero-stagger > :nth-child(2) {
+  animation-delay: 0.08s;
+}
+.hero-stagger > :nth-child(3) {
+  animation-delay: 0.16s;
+}
+.hero-stagger > :nth-child(4) {
+  animation-delay: 0.24s;
+}
+.hero-stagger > :nth-child(5) {
+  animation-delay: 0.32s;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
   *,
   *::before,
   *::after {

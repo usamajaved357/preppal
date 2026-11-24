@@ -4,6 +4,25 @@ Newest entry on top. Every session appends one entry: Done / In progress / Next 
 
 ---
 
+## 2026-11-24 — Session 3d: hero slideshow
+**Done**: hero slideshow rebuilt — 8 high-res free Unsplash photos (karahi, kababs, curry, daal, spices, ginger…)
+loaded from Unsplash's CDN at the right size per screen, 3.5 s per photo (was 5 s), per-photo camera moves,
+animated captions with tags, progress bars + counter, arrows and swipe. Old 491 px karahi crop replaced by its
+original. **Next**: consider self-hosting hero photos (R2) before launch; owner-managed hero slides (ROADMAP P3).
+
+---
+
+## 2026-11-24 — Session 3c: storefront motion + remaining admin-driven copy
+**Done**: `useStoreInfo()` hook — product cards, product page, order-placed, "How it works", trust strip and cart now
+use cutoff/delivery time/city from settings. Minimum order shown in cart (progress bar) and enforced in cart +
+checkout buttons. Header hides on scroll down / shows on scroll up with shadow; scroll reveals; add-to-cart toast,
+button pop and cart badge bump; hero cascade; floating chips; WhatsApp pulse. Fixed the deals photo blowing up the
+card; categories swipe on phones / centred rows on desktop; "How it works" numbered steps with a dashed connector;
+cart page rebuilt with a summary card; mobile header fits on one row.
+**Note**: the in-app test browser doesn't fire scroll events from scripted scrolls; verified with real wheel scrolling.
+
+---
+
 ## 2026-11-24 — Session 3b: order rows + capsule controls
 **Done**: order board rows rebuilt as a column table (wide) / stacked card (narrow) with rider under status and
 COD/Paid pill; prep list moves beside the board only at 2xl. Select/search are capsules with a padded custom chevron
