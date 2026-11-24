@@ -112,7 +112,8 @@ export function OrderDrawer({ order, onClose }: { order: AdminOrder; onClose: ()
               value={order.riderId ?? ''}
               disabled={rider.isPending}
               onChange={(e) => rider.mutate({ id: order.id, riderId: e.target.value || null })}
-              className="h-9 flex-1 text-sm"
+              compact
+              className="flex-1"
             >
               <option value="">Not assigned</option>
               {riders.data

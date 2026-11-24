@@ -70,7 +70,7 @@ export function ProductSidebar({
               title="New category"
               aria-label="New category"
               onClick={() => setNewCat(true)}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line-strong text-ink transition hover:bg-subtle"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line-strong text-ink transition hover:bg-subtle"
             >
               <IconPlus width={16} height={16} />
             </button>

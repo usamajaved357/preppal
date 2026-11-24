@@ -5,7 +5,7 @@ import type {
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react';
-import { IconCheck, IconSearch } from '../icons';
+import { IconCheck, IconChevronDown, IconSearch } from '../icons';
 
 // ───────────── Buttons ─────────────
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'brand';
@@ -57,8 +57,14 @@ export function IconButton({
 }
 
 // ───────────── Form controls ─────────────
-export const inputCls =
-  'h-10 w-full rounded-xl border border-line-strong bg-surface px-3.5 text-[14.5px] text-ink outline-none transition placeholder:text-faint hover:border-faint focus:border-ink/60 focus:ring-4 focus:ring-ink/8 disabled:bg-subtle disabled:text-muted';
+/** Shared look for every text control. Shape (radius) and horizontal padding are added per control so they never clash. */
+export const fieldBase =
+  'w-full border border-line-strong bg-surface text-[14.5px] text-ink outline-none transition placeholder:text-faint hover:border-faint focus:border-ink/60 focus:ring-4 focus:ring-ink/8 disabled:bg-subtle disabled:text-muted';
+
+/** Boxed text input (forms). */
+export const inputCls = `${fieldBase} h-10 rounded-xl px-3.5`;
+/** Capsule controls: search bars and dropdown menus. */
+export const pillCls = `${fieldBase} h-10 rounded-full px-4`;
 
 /** Labelled form field. Use `group` when the content holds buttons (a <label> would click the first one). */
 export function Field({
@@ -88,8 +94,12 @@ export function Field({
   );
 }
 
-export const Input = ({ className = '', ...p }: InputHTMLAttributes<HTMLInputElement>) => (
-  <input {...p} className={`${inputCls} ${className}`} />
+export const Input = ({
+  className = '',
+  pill = false,
+  ...p
+}: InputHTMLAttributes<HTMLInputElement> & { pill?: boolean }) => (
+  <input {...p} className={`${pill ? pillCls : inputCls} ${className}`} />
 );
 
 /** Input with a fixed prefix such as "Rs". */
@@ -103,7 +113,7 @@ export function PrefixInput({
       <span className="pointer-events-none absolute inset-y-0 left-3.5 grid place-items-center text-sm font-semibold text-faint">
         {prefix}
       </span>
-      <input {...p} className={`${inputCls} pl-10 tabular-nums`} />
+      <input {...p} className={`${fieldBase} h-10 rounded-xl pr-3.5 pl-10 tabular-nums`} />
     </div>
   );
 }
@@ -116,17 +126,40 @@ export function SearchInput({ className = '', ...p }: InputHTMLAttributes<HTMLIn
         height={16}
         className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-faint"
       />
-      <input type="search" {...p} className={`${inputCls} rounded-full pl-10`} />
+      <input type="search" {...p} className={`${fieldBase} h-10 rounded-full pr-4 pl-10`} />
     </div>
   );
 }
 
-export const Select = ({ className = '', ...p }: SelectHTMLAttributes<HTMLSelectElement>) => (
-  <select {...p} className={`${inputCls} cursor-pointer pr-8 ${className}`} />
-);
+/**
+ * Capsule dropdown with its own chevron, inset from the right edge.
+ * `className` styles the wrapper (width, flex); `compact` makes it 36px tall.
+ */
+export function Select({
+  className = '',
+  compact = false,
+  ...p
+}: SelectHTMLAttributes<HTMLSelectElement> & { compact?: boolean }) {
+  return (
+    <div className={`relative min-w-0 ${className}`}>
+      <select
+        {...p}
+        className={`${fieldBase} cursor-pointer appearance-none truncate rounded-full pr-11 pl-4 ${compact ? 'h-9 text-sm' : 'h-10'}`}
+      />
+      <IconChevronDown
+        width={16}
+        height={16}
+        className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-muted"
+      />
+    </div>
+  );
+}
 
 export const Textarea = ({ className = '', ...p }: TextareaHTMLAttributes<HTMLTextAreaElement>) => (
-  <textarea {...p} className={`${inputCls} h-auto min-h-20 resize-y py-2.5 leading-relaxed ${className}`} />
+  <textarea
+    {...p}
+    className={`${fieldBase} min-h-20 resize-y rounded-xl px-3.5 py-2.5 leading-relaxed ${className}`}
+  />
 );
 
 export function Toggle({

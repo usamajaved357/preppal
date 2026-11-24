@@ -38,7 +38,7 @@ export function PrepList({ date }: { date: string }) {
   const totalUnits = rows.reduce((a, r) => a + r.qty, 0);
 
   return (
-    <div data-print-section="prep" className="lg:sticky lg:top-6">
+    <div data-print-section="prep" className="2xl:sticky 2xl:top-6">
       <Card
         icon={<IconChef width={18} height={18} />}
         tone="clay"
@@ -62,7 +62,7 @@ export function PrepList({ date }: { date: string }) {
               Quantities add up here as orders come in. Cancelled orders are left out.
             </EmptyState>
           ) : (
-            <ul className="flex flex-col gap-1">
+            <ul className="grid gap-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-1">
               {Object.entries(groups).map(([product, variants]) => (
                 <li key={product} className="rounded-2xl px-3 py-2.5 transition hover:bg-subtle">
                   <div className="text-sm font-bold text-ink">{product}</div>

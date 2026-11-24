@@ -142,7 +142,6 @@ export function InventoryPage() {
                   setEdits({});
                   setCityId(e.target.value);
                 }}
-                className="rounded-full"
               >
                 {cities.data?.map((c) => (
                   <option key={c.id} value={c.id}>

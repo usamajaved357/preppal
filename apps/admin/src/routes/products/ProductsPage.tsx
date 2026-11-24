@@ -143,7 +143,6 @@ export function ProductsPage() {
                 aria-label="Filter by category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="rounded-full"
               >
                 <option value="">All categories</option>
                 {cats.data?.map((c) => (

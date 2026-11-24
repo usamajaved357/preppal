@@ -59,3 +59,8 @@ export const IconMenu = (p: SVGProps<SVGSVGElement>) => (
     <path d="M4 7h16M4 12h16M4 17h16" />
   </svg>
 );
+export const IconChevronDown = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}>
+    <path d="M6 9l6 6 6-6" />
+  </svg>
+);

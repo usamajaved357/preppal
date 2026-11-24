@@ -132,10 +132,11 @@ export function OrdersPage() {
                 aria-label="Pick another delivery day"
                 value={date}
                 onChange={(e) => e.target.value && setDate(e.target.value)}
-                className="h-9 rounded-full text-sm"
+                pill
+                className="text-sm"
               />
             </div>
-            <Button variant="secondary" size="sm" className="h-9" onClick={() => printSection('orders')}>
+            <Button variant="secondary" onClick={() => printSection('orders')}>
               <IconPrinter width={16} height={16} /> Print
             </Button>
           </div>
@@ -180,7 +181,7 @@ export function OrdersPage() {
 
       <ErrorNote error={orders.error} />
 
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid items-start gap-5 2xl:grid-cols-[minmax(0,1fr)_340px]">
         <div data-print-section="orders" className="min-w-0">
           <Card
             icon={<IconOrders width={18} height={18} />}
