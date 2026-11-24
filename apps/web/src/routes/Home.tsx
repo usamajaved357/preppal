@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import { CategoryShowcase } from '../components/CategoryShowcase';
 import { CutoffCountdown } from '../components/CutoffCountdown';
 import { HeroSlideshow } from '../components/HeroSlideshow';
 import { Deals, Feature, HowItWorks, InstagramStrip, SectionHeading } from '../components/HomeSections';
@@ -22,6 +23,11 @@ export function HomePage() {
     const used = new Set(products.data?.map((p) => p.categorySlug));
     return [{ slug: 'all', name: 'All' }, ...(categories.data ?? []).filter((c) => used.has(c.slug))];
   }, [categories.data, products.data]);
+  const counts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const p of products.data ?? []) m.set(p.categorySlug, (m.get(p.categorySlug) ?? 0) + 1);
+    return m;
+  }, [products.data]);
   const query = useSearch((st) => st.query);
   const setQuery = useSearch((st) => st.setQuery);
   const needle = query.trim().toLowerCase();
@@ -105,45 +111,30 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Categories — scrolls sideways on phones, centred rows on desktop */}
+      {/* Categories — bento grid of photo cards */}
       <section id="categories" className="mx-auto max-w-7xl scroll-mt-24 px-6 pt-16">
-        <SectionHeading
-          kicker="Fresh every morning"
-          title="Shop by category"
-          sub="Everything prepped, washed and ready for the pan"
-        />
-        <div className="-mx-6 mt-7 flex snap-x gap-5 overflow-x-auto px-6 pb-3 md:mx-0 md:flex-wrap md:justify-center md:gap-x-7 md:gap-y-7 md:overflow-visible md:px-0">
-          {(categories.data ?? []).map((c, i) => (
-            <Reveal key={c.id} delay={i * 55} className="w-[116px] shrink-0 snap-start md:w-[140px]">
-              <button
-                type="button"
-                onClick={() => pickCategory(c.slug)}
-                className="group flex w-full flex-col items-center gap-3 text-center"
-              >
-                <span
-                  className={`block h-[108px] w-[108px] overflow-hidden rounded-full bg-sand shadow-[0_10px_24px_rgba(22,58,44,.14)] ring-offset-4 ring-offset-cream transition duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_16px_32px_rgba(22,58,44,.22)] md:h-[132px] md:w-[132px] ${
-                    filter === c.slug ? 'ring-3 ring-forest' : 'group-hover:ring-2 group-hover:ring-sage'
-                  }`}
-                >
-                  {c.imageUrl && (
-                    <img
-                      src={c.imageUrl}
-                      alt=""
-                      loading="lazy"
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
-                    />
-                  )}
-                </span>
-                <span className="flex flex-col">
-                  <span className={`text-[15px] font-semibold ${filter === c.slug ? 'text-forest' : ''}`}>
-                    {c.name}
-                  </span>
-                  <span className="text-[12.5px] text-muted">{c.description}</span>
-                </span>
-              </button>
-            </Reveal>
-          ))}
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <SectionHeading
+            kicker="Fresh every morning"
+            title="Shop by category"
+            sub="Everything prepped, washed and ready for the pan"
+          />
+          {filter !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setFilter('all')}
+              className="animate-rise rounded-full border border-[#DDD6C7] bg-white px-4 py-2 text-sm font-semibold text-forest transition hover:border-forest"
+            >
+              Show all categories
+            </button>
+          )}
         </div>
+        <CategoryShowcase
+          categories={categories.data ?? []}
+          counts={counts}
+          active={filter}
+          onPick={pickCategory}
+        />
       </section>
 
       {/* Products */}

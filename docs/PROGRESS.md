@@ -4,6 +4,17 @@ Newest entry on top. Every session appends one entry: Done / In progress / Next 
 
 ---
 
+## 2026-11-24 — Session 3e: category grid, header fix, policy pages
+**Done**: "Shop by category" is now a bento grid of photo cards (`components/CategoryShowcase.tsx`): first category
+(admin order) is a big featured tile, product counts per card, a WhatsApp filler card keeps the grid flush for any
+count. Header fix: it stayed visible after clicking a header link (focus stayed on the link) — now it only stays while
+typing in the search box. New pages /delivery, /refunds, /privacy, /terms (`routes/Legal.tsx`, content in
+`lib/legal.ts`, uses settings for cutoff/time/city/WhatsApp), footer rebuilt with Shop / Help / Legal / Contact
+columns and bottom policy links.
+**Next**: have the policy wording reviewed before launch.
+
+---
+
 ## 2026-11-24 — Session 3d: hero slideshow
 **Done**: hero slideshow rebuilt — 8 high-res free Unsplash photos (karahi, kababs, curry, daal, spices, ginger…)
 loaded from Unsplash's CDN at the right size per screen, 3.5 s per photo (was 5 s), per-photo camera moves,

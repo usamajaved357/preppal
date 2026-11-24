@@ -35,7 +35,7 @@ Legend: `[x]` done · `[ ]` todo · `[~]` partly done. Update this file at the e
 - [ ] `wrangler d1 create`, migrate + seed remote, set real ACCESS_* vars and secrets
 - [ ] Verify Resend domain; set alert emails in Settings
 - [ ] Cloudflare Web Analytics on storefront
-- [ ] Privacy policy + terms pages
+- [x] Privacy policy + terms pages (also delivery + refund/return policies; footer links) — review wording before launch
 - [ ] Smoke test on real phones (Android Chrome, low-end)
 
 ## P3 — Merchandising

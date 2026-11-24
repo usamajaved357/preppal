@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { q } from '../lib/api';
 import { cartCount, useCart } from '../lib/cart';
 import { useSearch } from '../lib/search';
@@ -43,11 +43,15 @@ export function Layout() {
   const navigate = useNavigate();
   const path = useRouterState({ select: (st) => st.location.pathname });
   const { hidden, scrolled } = useHideOnScroll();
-  // Keep the header on screen while something in it (search box, menu) has focus.
+  // Keep the header on screen only while the visitor is typing in the header search box.
+  // (Clicked links keep focus too, so checking "any focus inside" kept the header stuck on screen.)
   const headerRef = useRef<HTMLElement>(null);
   const [focused, setFocused] = useState(false);
   useEffect(() => {
-    const sync = () => setFocused(!!headerRef.current?.contains(document.activeElement));
+    const sync = () => {
+      const el = document.activeElement;
+      setFocused(!!el && el.tagName === 'INPUT' && !!headerRef.current?.contains(el));
+    };
     const onOut = () => setTimeout(sync, 0); // activeElement updates after focusout
     document.addEventListener('focusin', sync);
     document.addEventListener('focusout', onOut);
@@ -116,6 +120,7 @@ export function Layout() {
             role="search"
             onSubmit={(e) => {
               e.preventDefault();
+              (document.activeElement as HTMLElement | null)?.blur();
               goToMenu();
             }}
             className="order-last flex h-11 flex-[1_1_100%] items-center gap-2.5 rounded-full bg-[#F4F0E7] px-4 ring-forest/30 transition focus-within:bg-white focus-within:ring-2 md:order-none md:flex-[1_1_240px]"
@@ -182,7 +187,7 @@ export function Layout() {
       </main>
 
       <footer className="mt-20 bg-forest-deep text-[#D7E2D6]">
-        <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-10 px-6 pb-8 pt-14">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 pt-14 pb-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1.2fr]">
           <div className="flex max-w-xs flex-col gap-3.5">
             <div className="flex items-center gap-3">
               <img src="/images/logo.png" alt="" className="h-14 w-14" />
@@ -190,13 +195,24 @@ export function Layout() {
             </div>
             <p className="leading-relaxed">Stop chopping. Start cooking. We handle all the prep.</p>
           </div>
-          <div className="flex flex-col gap-2.5">
-            <span className="font-semibold text-white">Shop</span>
+          <FooterColumn title="Shop">
             <a href="/#menu">Tomorrow's menu</a>
+            <a href="/#categories">Categories</a>
+            <Link to="/cart">Cart</Link>
             <Link to="/track">Track order</Link>
-          </div>
-          <div className="flex flex-col gap-2.5">
-            <span className="font-semibold text-white">Contact</span>
+          </FooterColumn>
+          <FooterColumn title="Help">
+            <Link to="/delivery">Delivery policy</Link>
+            <Link to="/refunds">Refunds & returns</Link>
+            <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer">
+              Contact us
+            </a>
+          </FooterColumn>
+          <FooterColumn title="Legal">
+            <Link to="/privacy">Privacy policy</Link>
+            <Link to="/terms">Terms & conditions</Link>
+          </FooterColumn>
+          <FooterColumn title="Contact">
             <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer">
               WhatsApp {formatWhatsapp(wa)}
             </a>
@@ -208,10 +224,26 @@ export function Layout() {
               Instagram @{settings?.instagramHandle ?? 'preppal.swl'}
             </a>
             <span>{city}, Punjab</span>
-          </div>
+          </FooterColumn>
         </div>
-        <div className="border-t border-[#22513E] px-6 py-4 text-center text-[13px] text-[#A9BFAF]">
-          © {new Date().getFullYear()} Preppal · Cash on delivery
+        <div className="border-t border-[#22513E]">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-4 text-[13px] text-[#A9BFAF]">
+            <span>© {new Date().getFullYear()} Preppal · Cash on delivery</span>
+            <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-1">
+              <Link to="/privacy" className="hover:text-white">
+                Privacy
+              </Link>
+              <Link to="/terms" className="hover:text-white">
+                Terms
+              </Link>
+              <Link to="/refunds" className="hover:text-white">
+                Refunds
+              </Link>
+              <Link to="/delivery" className="hover:text-white">
+                Delivery
+              </Link>
+            </nav>
+          </div>
         </div>
       </footer>
 
@@ -240,8 +272,17 @@ export function Layout() {
         aria-label="Order on WhatsApp"
         className="fixed right-5 bottom-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:scale-110 before:absolute before:inset-0 before:animate-ping before:rounded-full before:bg-[#25D366]/40 before:[animation-duration:2.6s] [&>svg]:relative"
       >
-        <IconWhatsApp width={26} height={26} />
+        <IconWhatsApp width={30} height={30} />
       </a>
+    </div>
+  );
+}
+
+function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2.5 [&_a]:w-fit [&_a]:transition [&_a:hover]:text-white [&_a:hover]:translate-x-0.5">
+      <span className="mb-1 font-semibold text-white">{title}</span>
+      {children}
     </div>
   );
 }
