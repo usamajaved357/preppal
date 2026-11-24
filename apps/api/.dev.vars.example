@@ -1,0 +1,8 @@
+# Copy to .dev.vars for local development (never commit .dev.vars).
+ENVIRONMENT=development
+# Local dev skips Cloudflare Access and acts as this admin (must exist in admin_users).
+DEV_ADMIN_EMAIL=owner@example.com
+# Optional — alerts are skipped when unset.
+RESEND_API_KEY=
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=

@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+/* Preppal design tokens — see docs/DESIGN.md. Change here, not in components. */
+@theme {
+  --color-forest: #1f4d3a;
+  --color-forest-deep: #163a2c;
+  --color-sage: #c8db8a;
+  --color-sage-soft: #eaf0e2;
+  --color-cream: #faf7f1;
+  --color-cream-btn: #f6f1e4;
+  --color-sand: #f1ece1;
+  --color-ink: #1b2a22;
+  --color-muted: #5c6a61;
+  --color-line: #ece6da;
+  --color-terra: #c4572a;
+  --color-gold: #8a6a2e;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+
+  --animate-rise: rise 0.7s ease both;
+  --animate-kenburns: kenburns 9s ease-in-out infinite alternate;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes kenburns {
+    from {
+      transform: scale(1.02);
+    }
+    to {
+      transform: scale(1.12);
+    }
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-cream);
+    color: var(--color-ink);
+  }
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-sage);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "preppal",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "db:generate": "pnpm --filter @preppal/db generate",
+    "db:migrate:local": "pnpm --filter @preppal/api db:migrate:local",
+    "db:seed:local": "pnpm --filter @preppal/api db:seed:local",
+    "deploy": "turbo run deploy"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.8",
+    "turbo": "^2.11.13",
+    "typescript": "5.9.3",
+    "vitest": "^5.1.1"
+  }
+}

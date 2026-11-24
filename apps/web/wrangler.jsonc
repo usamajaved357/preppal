@@ -1,0 +1,17 @@
+{
+  // Storefront: static React build + a tiny Worker that forwards /api/* to the API Worker
+  // (service binding, no CORS) and injects link-preview tags on /p/:slug.
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "preppal-web",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/p/*"]
+  },
+  "services": [{ "binding": "API", "service": "preppal-api" }],
+  "observability": { "enabled": true }
+  // After buying the domain: "routes": [{ "pattern": "preppal.pk", "custom_domain": true }]
+}

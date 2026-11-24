@@ -1,0 +1,31 @@
+{
+  "name": "@preppal/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port 8787 --persist-to ../../.wrangler/state",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "cf-typegen": "wrangler types",
+    "db:migrate:local": "wrangler d1 migrations apply preppal-db --local --persist-to ../../.wrangler/state",
+    "db:migrate:remote": "wrangler d1 migrations apply preppal-db --remote",
+    "db:seed:local": "wrangler d1 execute preppal-db --local --persist-to ../../.wrangler/state --file ../../packages/db/seed/seed.sql",
+    "db:seed:remote": "wrangler d1 execute preppal-db --remote --file ../../packages/db/seed/seed.sql"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.9.1",
+    "@preppal/db": "workspace:*",
+    "@preppal/shared": "workspace:*",
+    "drizzle-orm": "^0.45.4",
+    "hono": "^4.13.20",
+    "jose": "^6.2.18",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261123.1",
+    "wrangler": "^4.166.0"
+  }
+}

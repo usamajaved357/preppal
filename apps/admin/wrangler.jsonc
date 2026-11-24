@@ -1,0 +1,17 @@
+{
+  // Admin panel: static React build + Worker forwarding /api/* to the API Worker.
+  // Protect the whole hostname with Cloudflare Access (Zero Trust) — see docs/DEPLOY.md.
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "preppal-admin",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "services": [{ "binding": "API", "service": "preppal-api" }],
+  "observability": { "enabled": true }
+  // After buying the domain: "routes": [{ "pattern": "admin.preppal.pk", "custom_domain": true }]
+}
