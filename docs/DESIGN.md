@@ -60,4 +60,9 @@ breadcrumb bar. Headings are DM Sans bold (Fraunces only for the Preppal wordmar
     `RowMenu` ("⋯" actions, flips upward near the bottom), `SaveBar` (dark pill), toasts + confirm dialog.
 - Create/edit dialogs follow the "promo code" pattern: numbered steps on the left, live storefront preview on the
   right (see `CategoryModal`).
+- Shapes: search bars and dropdowns are **capsules** (`SearchInput`, `Select` with its own chevron 16px from the right,
+  `Input pill`); form text fields stay rounded boxes. Each control owns its radius/padding (built on `fieldBase`) —
+  don't override radius or padding through `className`.
+- Order board is a table at container width ≥ 48rem (Customer · Items · Status + rider · Total + COD/Paid · next step)
+  and a stacked card below that (container queries, so it adapts to the panel, not the window).
 - Printing: `data-print-hide` hides chrome; `printSection('prep')` prints only the prep list.

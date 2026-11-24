@@ -14,9 +14,9 @@ import { SaveBar, useFeedback } from '../../components/overlays';
 import {
   ErrorNote,
   Field,
+  fieldBase,
   IconChip,
   Input,
-  fieldBase,
   OptionCard,
   PageHeader,
   PrefixInput,
@@ -256,7 +256,9 @@ export function SettingsPage() {
           body="Emails that get a message for every new order. Needs RESEND_API_KEY and a verified domain."
         >
           <Field label="Alert emails" hint="Press Enter or comma after each email" group>
-            <div className={`${fieldBase} flex min-h-10 flex-wrap items-center gap-1.5 rounded-xl px-3.5 py-1.5`}>
+            <div
+              className={`${fieldBase} flex min-h-10 flex-wrap items-center gap-1.5 rounded-xl px-3.5 py-1.5`}
+            >
               {form.alertEmails.map((e) => (
                 <span
                   key={e}

@@ -2,8 +2,8 @@ import { formatDeliveryDate, formatPkr } from '@preppal/shared';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { type FormEvent, useEffect, useState } from 'react';
-import { ApiError, api, q } from '../lib/api';
 import { IconChevronDown } from '../components/icons';
+import { ApiError, api, q } from '../lib/api';
 import { cartSubtotal, useCart } from '../lib/cart';
 
 const input =
@@ -126,21 +126,21 @@ export function CheckoutPage() {
               <label className="flex flex-col gap-1.5 text-sm font-semibold">
                 Area
                 <span className="relative">
-                <select
-                  required
-                  value={form.areaId}
-                  onChange={set('areaId')}
-                  className={`${input} w-full cursor-pointer appearance-none !rounded-full !pr-11 !pl-4`}
-                >
-                  <option value="">Choose your area</option>
-                  {areas.data?.areas.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                      {a.deliveryFeePkr ? ` — ${formatPkr(a.deliveryFeePkr)} delivery` : ' — free delivery'}
-                    </option>
-                  ))}
-                </select>
-                <IconChevronDown className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-muted" />
+                  <select
+                    required
+                    value={form.areaId}
+                    onChange={set('areaId')}
+                    className={`${input} w-full cursor-pointer appearance-none !rounded-full !pr-11 !pl-4`}
+                  >
+                    <option value="">Choose your area</option>
+                    {areas.data?.areas.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.name}
+                        {a.deliveryFeePkr ? ` — ${formatPkr(a.deliveryFeePkr)} delivery` : ' — free delivery'}
+                      </option>
+                    ))}
+                  </select>
+                  <IconChevronDown className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-muted" />
                 </span>
               </label>
             </div>

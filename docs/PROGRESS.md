@@ -4,6 +4,14 @@ Newest entry on top. Every session appends one entry: Done / In progress / Next 
 
 ---
 
+## 2026-11-24 — Session 3b: order rows + capsule controls
+**Done**: order board rows rebuilt as a column table (wide) / stacked card (narrow) with rider under status and
+COD/Paid pill; prep list moves beside the board only at 2xl. Select/search are capsules with a padded custom chevron
+everywhere (admin + storefront checkout area select). Docs, CLAUDE.md and .claude/ are now git-ignored (local only).
+**Next**: unchanged from Session 3.
+
+---
+
 ## 2026-11-24 — Session 3: admin v2 design + full CRUD + storefront controls (Claude Code)
 **Done**
 - Studied the Selling Squads app + admin console (in Chrome) and rebuilt the admin design system to that level:

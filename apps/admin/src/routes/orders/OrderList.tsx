@@ -88,7 +88,12 @@ function OrderRow({ o, rider, onOpen }: { o: AdminOrder; rider?: string; onOpen:
   return (
     <li className={`group relative transition hover:bg-subtle/80 ${closed ? 'opacity-75' : ''}`}>
       {/* Whole row opens the drawer; buttons sit above this layer. */}
-      <button type="button" onClick={onOpen} aria-label={`Open order ${o.number}`} className="absolute inset-0 z-0" />
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`Open order ${o.number}`}
+        className="absolute inset-0 z-0"
+      />
 
       <div className={`grid grid-cols-1 gap-x-5 gap-y-3 px-5 py-4 @3xl:items-center ${COLS}`}>
         {/* Customer */}
@@ -111,7 +116,10 @@ function OrderRow({ o, rider, onOpen }: { o: AdminOrder; rider?: string; onOpen:
               <span className="text-faint">·</span>
               <span>{time(o.createdAt)}</span>
             </div>
-            <div className="mt-0.5 truncate text-[13px] text-muted" title={`${o.areaName} · ${o.addressLine1}`}>
+            <div
+              className="mt-0.5 truncate text-[13px] text-muted"
+              title={`${o.areaName} · ${o.addressLine1}`}
+            >
               {o.areaName} · {o.addressLine1}
             </div>
           </div>
@@ -149,7 +157,9 @@ function OrderRow({ o, rider, onOpen }: { o: AdminOrder; rider?: string; onOpen:
         {/* Total + actions: one footer row when narrow, two columns when wide */}
         <div className="flex items-center justify-between gap-3 border-t border-dashed border-line pt-3 @md:pl-[52px] @3xl:contents">
           <div className="flex items-center gap-2 @3xl:flex-col @3xl:items-end @3xl:gap-1">
-            <span className="text-[15px] font-bold whitespace-nowrap text-ink tabular-nums">{formatPkr(o.totalPkr)}</span>
+            <span className="text-[15px] font-bold whitespace-nowrap text-ink tabular-nums">
+              {formatPkr(o.totalPkr)}
+            </span>
             {payment}
           </div>
           <div className="relative z-10 flex min-w-0 items-center justify-end gap-2">
