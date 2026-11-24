@@ -38,3 +38,15 @@ countdown). Real photography only — no illustrations.
 - `public/images/products/*` — cropped from Preppal's Instagram posts (replace with original photos).
 - `public/images/site/*` — Unsplash (free licence): chopping, karahi, mortar, spread, onions, spices, grill, thali.
 - Logo: `public/images/logo.png` (from Instagram profile; get the vector original).
+
+## Admin panel (redesigned 2026-11-24)
+- Extra tokens live only in `apps/admin/src/styles.css`: `canvas` (page bg), `line-strong` (input borders),
+  `nav-text`/`nav-muted` (sidebar), `terra-soft`/`terra-ink`, and soft/ink pairs for order statuses —
+  amber (received), sky (confirmed), plum (preparing), clay (out for delivery), sage (delivered), stone (cancelled),
+  terra (failed). Use `<Badge tone>` rather than raw classes.
+- Layout: dark forest sidebar grouped Daily / Catalog / Setup with a pending-orders count; collapses to a top bar +
+  menu on phones. Content max width 1280 px. Page header = gold kicker + Fraunces title + one-line subtitle.
+- Components (`components/ui.tsx`, `overlays.tsx`): Button (primary/secondary/ghost/danger, sm/md), Field, Input,
+  PrefixInput (Rs, @, +), Select, Textarea, Toggle, Segmented, Card, Badge, EmptyState, Skeleton, Avatar,
+  toasts, confirm dialog, Modal, Drawer, SaveBar. See ADR-012 for when to use which.
+- Printing: elements with `data-print-hide` are hidden; the prep list prints on its own via `printSection('prep')`.

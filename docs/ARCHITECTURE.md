@@ -39,7 +39,15 @@ apps/
     public/images/          logo, product photos (from Preppal Instagram), stock photos (Unsplash)
   admin/      Admin panel
     worker/index.ts         edge proxy
-    src/routes/             Orders (+prep list), Products (+edit, variants, uploads), Inventory, Setup (areas, settings, team)
+    src/components/         Shell (grouped sidebar / mobile menu), ui (buttons, fields, toggle, segmented, badge…),
+                            overlays (toasts, confirm dialog, modal, drawer, sticky SaveBar), icons
+    src/lib/                api client + row types, me (signed-in admin), site (storefront URL, phone/money/hour helpers), image
+    src/routes/orders/      OrdersPage (day picker, KPIs, filters, search), OrderList, OrderDrawer (detail, rider, COD,
+                            timeline), PrepList (+print), status.ts (tones, action labels, useOrderActions)
+    src/routes/products/    ProductsPage (grid + filters), ProductEditPage, ProductSidebar, PhotosCard, VariantsCard
+    src/routes/Inventory.tsx  grouped by product, edits batched behind one "Save all" bar
+    src/routes/setup/       Areas, Team (admins + riders, modals), Settings (live preview, email chips)
+    public/images → ../../web/public/images   symlink so seed photos load in admin too (ADR-011)
 packages/
   shared/     Zod schemas, DTO types, order status machine, time + money helpers, constants
   db/         Drizzle schema, migrations (drizzle-kit), seed.sql

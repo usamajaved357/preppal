@@ -4,6 +4,42 @@ Newest entry on top. Every session appends one entry: Done / In progress / Next 
 
 ---
 
+## 2026-11-24 — Session 2: admin panel redesign (Claude Code)
+**Done**
+- Local setup: pnpm via corepack, `pnpm install`, local D1 migrated + seeded, `.claude/launch.json` for api/web/admin dev servers.
+- Fixed broken product photos in admin (seed images live in the web app) → `apps/admin/public/images` symlink (ADR-011).
+- Redesigned every admin page (ADR-012 patterns, DESIGN.md "Admin panel"):
+  - Shell: grouped sidebar with icons, pending-orders badge, signed-in card, "View storefront", mobile top bar + menu, nicer no-access screen.
+  - Orders: Today/Tomorrow/next-day chips + date picker, KPI cards (to confirm, cash collected progress, delivered progress),
+    search, status filter pills with counts, two-line order rows with one "next step" button + WhatsApp, order drawer
+    (customer call/WhatsApp, address + note, rider assignment, itemised totals, cash-collected toggle, status timeline),
+    confirm dialog for cancel, grouped prep list that prints on its own.
+  - Products: photo grid with badge/status, "needs price" banner + filter, search, category filter. Editor with
+    visibility cards, organise card, live preview, drag-and-drop multi-photo upload + "make cover", sizes table with
+    Rs inputs and on-sale toggles, sticky unsaved-changes bar.
+  - Inventory: grouped by product with thumbnails, toggles, Rs city price, low/sold-out badges, filters, edits batched
+    into one "Save all"; labelled inputs on mobile.
+  - Delivery areas / Team & riders: list rows with toggles + edit modals (riders and admins can now be edited/disabled).
+  - Settings: sectioned layout, cutoff as a time picker, live "how ordering works" sentence, day selector, email chips.
+- Toasts for every save; no more `window.confirm`.
+- Verified in the browser at desktop and phone widths; all 8 admin routes load with no console errors;
+  `pnpm typecheck`, `pnpm test`, `pnpm lint`, admin `vite build` pass.
+
+**In progress**
+- Nothing.
+
+**Next**
+1. Same visual pass on the storefront (still never checked in a browser per Session 1 note).
+2. Categories management UI in admin (API exists: GET/POST/PUT /admin/categories).
+3. ROADMAP P1 items (createOrder integration tests, header search, category page, 404/error boundaries).
+
+**Blockers / notes**
+- Local DB has demo data from this session (prices on 6 sizes, 2 areas, 2 riders, 5 orders for 25 Nov). Reset with
+  `rm -rf .wrangler/state && pnpm db:migrate:local && pnpm db:seed:local`.
+- Admin JS bundle is ~500 kB (150 kB gzip); route-level code splitting would help if it grows.
+
+---
+
 ## 2026-11-23 — Session 1: initial build (Claude, chat)
 **Done**
 - Brand research from Instagram @preppal.swl; competitor review (HelloFresh, Licious, Gousto, Freshmate); approved design (canvas "Preppal — Storefront & Admin Design").

@@ -24,6 +24,8 @@ Legend: `[x]` done · `[ ]` todo · `[~]` partly done. Update this file at the e
 - [ ] 404 page + error boundary in both apps
 - [ ] Product images responsive sizes (`srcset`) once real photos arrive
 
+- [x] Admin UI redesign: navigation, order drawer + timeline, product editor, batched inventory, setup modals, mobile layout
+
 ## P2 — Launch
 - [ ] Buy domain, add to Cloudflare, custom domains for web + admin (docs/DEPLOY.md)
 - [ ] Cloudflare Access app for admin hostname with owner/staff emails
@@ -40,7 +42,7 @@ Legend: `[x]` done · `[ ]` todo · `[~]` partly done. Update this file at the e
 - [ ] Recipes section (from Instagram "preppal recipes" highlight)
 
 ## P4 — Operations
-- [ ] Rider assignment UI on orders board (API exists: PATCH /orders/:id/rider)
+- [x] Rider assignment UI on orders board (order drawer)
 - [ ] Printable order slips / labels
 - [ ] Daily summary to Telegram at cutoff (Cron Trigger)
 - [ ] Simple sales report (per day/product)

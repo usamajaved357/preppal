@@ -48,3 +48,16 @@ Avoids a generated route tree in a small app. Routes are listed in `src/router.t
 Telegram bot is free and instant; Resend free tier (100/day, 3,000/month) for email once a domain is verified.
 Both optional via secrets; failures never block an order (`waitUntil`). WhatsApp Cloud API costs per
 conversation — revisit later.
+
+## ADR-011 — Admin shares storefront images via symlink · 2026-11-24 · Accepted
+Seed product photos are static files in `apps/web/public/images` with keys like `/images/products/x.jpg`, so the
+admin (a separate origin) showed broken images. `apps/admin/public/images` is a symlink to the web folder: Vite serves
+it in dev and copies the real files into `dist` on build (verified). No duplicate files in git, no extra Worker code.
+Once all photos are R2 uploads (`/api/img/…`) the symlink can go. Windows checkouts need `git config core.symlinks true`.
+
+## ADR-012 — Admin UI patterns · 2026-11-24 · Accepted
+One way to do each thing so pages feel consistent: success/error feedback is a **toast** (`useFeedback().toast`),
+destructive steps use the **confirm dialog** (never `window.confirm`), multi-field edit pages show the sticky
+**SaveBar** when dirty (Product edit, Inventory "Save all", Settings), small create/edit forms open in a **Modal**
+(areas, admins, riders), and order details open in a **Drawer** so the board stays in view. Order rows show one
+primary "next step" button; less common/negative steps live in the drawer.
