@@ -1,7 +1,7 @@
 import { formatDeliveryDate } from '@preppal/shared';
 import { useQuery } from '@tanstack/react-query';
 import { IconChef, IconPrinter } from '../../components/icons';
-import { EmptyState, IconButton, Skeleton } from '../../components/ui';
+import { Card, EmptyState, IconButton, Skeleton } from '../../components/ui';
 import { get } from '../../lib/api';
 
 interface PrepRow {
@@ -38,53 +38,53 @@ export function PrepList({ date }: { date: string }) {
   const totalUnits = rows.reduce((a, r) => a + r.qty, 0);
 
   return (
-    <section
-      data-print-section="prep"
-      className="overflow-hidden rounded-2xl border border-line bg-white shadow-card lg:sticky lg:top-6"
-    >
-      <header className="flex items-start justify-between gap-3 bg-forest px-5 py-4 text-white">
+    <div data-print-section="prep" className="lg:sticky lg:top-6">
+      <Card
+        icon={<IconChef width={18} height={18} />}
+        tone="clay"
+        title="Prep list"
+        description={`${date ? formatDeliveryDate(date) : '…'} · ${totalUnits} unit${totalUnits === 1 ? '' : 's'} to make`}
+        actions={
+          <IconButton label="Print prep list" onClick={() => printSection('prep')} data-print-hide>
+            <IconPrinter width={17} height={17} />
+          </IconButton>
+        }
+        bodyClassName="px-2 pt-3 pb-2"
+      >
         <div>
-          <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-sage">Kitchen</div>
-          <h2 className="text-xl font-semibold">Prep list</h2>
-          <p className="text-[13px] text-nav-text">
-            {date ? formatDeliveryDate(date) : '…'} · {totalUnits} unit{totalUnits === 1 ? '' : 's'}
-          </p>
-        </div>
-        <IconButton
-          label="Print prep list"
-          onClick={() => printSection('prep')}
-          className="text-white hover:bg-white/10 hover:text-white"
-          data-print-hide
-        >
-          <IconPrinter />
-        </IconButton>
-      </header>
-      {prep.isLoading ? (
-        <div className="flex flex-col gap-2 p-4">
-          <Skeleton className="h-10" />
-          <Skeleton className="h-10" />
-        </div>
-      ) : rows.length === 0 ? (
-        <EmptyState icon={<IconChef />} title="Nothing to prep">
-          Quantities add up here as orders come in. Cancelled orders are left out.
-        </EmptyState>
-      ) : (
-        <ul className="divide-y divide-line">
-          {Object.entries(groups).map(([product, variants]) => (
-            <li key={product} className="px-5 py-3">
-              <div className="mb-1.5 text-sm font-semibold text-ink">{product}</div>
-              {variants.map((v) => (
-                <div key={v.variantLabel} className="flex items-center justify-between py-0.5 text-sm">
-                  <span className="text-muted">{v.variantLabel}</span>
-                  <span className="grid h-7 min-w-10 place-items-center rounded-lg bg-sage-soft px-2 font-bold text-forest tabular-nums">
-                    ×{v.qty}
-                  </span>
-                </div>
+          {prep.isLoading ? (
+            <div className="flex flex-col gap-2 p-3">
+              <Skeleton className="h-10" />
+              <Skeleton className="h-10" />
+            </div>
+          ) : rows.length === 0 ? (
+            <EmptyState icon={<IconChef />} title="Nothing to prep">
+              Quantities add up here as orders come in. Cancelled orders are left out.
+            </EmptyState>
+          ) : (
+            <ul className="flex flex-col gap-1">
+              {Object.entries(groups).map(([product, variants]) => (
+                <li key={product} className="rounded-2xl px-3 py-2.5 transition hover:bg-subtle">
+                  <div className="text-sm font-bold text-ink">{product}</div>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {variants.map((v) => (
+                      <span
+                        key={v.variantLabel}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface py-0.5 pr-1 pl-2.5 text-xs font-medium text-muted"
+                      >
+                        {v.variantLabel}
+                        <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-bold text-white tabular-nums">
+                          ×{v.qty}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                </li>
               ))}
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+            </ul>
+          )}
+        </div>
+      </Card>
+    </div>
   );
 }

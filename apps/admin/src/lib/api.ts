@@ -68,6 +68,7 @@ export interface AdminRider {
   name: string;
   phone: string;
   isActive: boolean;
+  orderCount?: number;
 }
 
 export interface AdminVariant {
@@ -103,5 +104,34 @@ export interface AdminCategory {
   id: string;
   name: string;
   slug: string;
+  description: string;
+  imageKey: string;
+  imageUrl: string | null;
+  sortOrder: number;
   isActive: boolean;
+  productCount: number;
 }
+
+export interface AdminCity {
+  id: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  areaCount: number;
+}
+
+/** Body accepted by POST/PUT /admin/products (mirrors productInputSchema). */
+export const productBody = (p: AdminProduct) => ({
+  name: p.name,
+  slug: p.slug,
+  categoryId: p.categoryId,
+  shortDescription: p.shortDescription,
+  description: p.description,
+  howToUse: p.howToUse,
+  ingredients: p.ingredients,
+  storage: p.storage,
+  badge: p.badge,
+  imageKeys: p.imageKeys,
+  status: p.status,
+  sortOrder: p.sortOrder,
+});

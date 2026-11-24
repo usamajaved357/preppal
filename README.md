@@ -12,7 +12,14 @@ pnpm --filter @preppal/web dev      # :5173  storefront
 pnpm --filter @preppal/admin dev    # :5174  admin
 ```
 
-- Working with Claude Code? Start with **CLAUDE.md**.
-- Architecture: `docs/ARCHITECTURE.md` · Data model: `docs/DATA_MODEL.md` · API: `docs/API.md`
-- What's done / next: `docs/PROGRESS.md`, `docs/ROADMAP.md` · Decisions: `docs/DECISIONS.md`
-- Deploy: `docs/DEPLOY.md` · Design tokens: `docs/DESIGN.md`
+## Layout
+- `apps/api` — Hono API on Cloudflare Workers (D1, R2)
+- `apps/web` — storefront (React, Vite, TanStack Router)
+- `apps/admin` — admin panel, behind Cloudflare Access
+- `packages/shared` — Zod schemas, types, order status machine, time/money helpers
+- `packages/db` — Drizzle schema, migrations, seed
+
+## Checks
+```bash
+pnpm typecheck && pnpm test && pnpm lint
+```

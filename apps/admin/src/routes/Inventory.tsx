@@ -1,18 +1,21 @@
 import { formatPkr } from '@preppal/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type ReactNode, useMemo, useState } from 'react';
-import { IconImage, IconSearch, IconStack } from '../components/icons';
+import { IconAlert, IconCheck, IconImage, IconPause, IconStack } from '../components/icons';
 import { SaveBar, useFeedback } from '../components/overlays';
 import {
   Badge,
+  Card,
   EmptyState,
   ErrorNote,
   Input,
   PageHeader,
   PrefixInput,
+  SearchInput,
   Segmented,
   Select,
   Skeleton,
+  StatStrip,
   Toggle,
 } from '../components/ui';
 import { type AdminProduct, get, send } from '../lib/api';
@@ -127,62 +130,95 @@ export function InventoryPage() {
   return (
     <>
       <PageHeader
-        kicker="Catalog"
         title="Inventory"
         subtitle="Switch sizes on or off, track stock, and cap how many can be ordered per delivery day."
         actions={
           multiCity && (
-            <Select
-              aria-label="City"
-              value={cityId}
-              onChange={(e) => {
-                setEdits({});
-                setCityId(e.target.value);
-              }}
-              className="w-48"
-            >
-              {cities.data?.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </Select>
+            <div className="w-48">
+              <Select
+                aria-label="City"
+                value={cityId}
+                onChange={(e) => {
+                  setEdits({});
+                  setCityId(e.target.value);
+                }}
+                className="rounded-full"
+              >
+                {cities.data?.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
           )
         }
       />
       <ErrorNote error={rows.error} />
 
-      <div className="mb-5 hidden gap-3 sm:grid sm:grid-cols-3">
-        <Legend title="Stock" body="Leave empty for made-to-order. A number counts down with every order." />
-        <Legend title="Daily limit" body="Max units sold per delivery day — great for fresh batches." />
-        <Legend title="City price" body="Overrides the product's base price in this city only." />
-      </div>
+      <StatStrip
+        className="mb-5"
+        stats={[
+          {
+            icon: <IconStack width={18} height={18} />,
+            tone: 'sky',
+            label: 'Sizes',
+            value: all.length,
+            sub: 'Across all products',
+          },
+          {
+            icon: <IconCheck width={18} height={18} />,
+            tone: 'green',
+            label: 'On sale',
+            value: onSale,
+            sub: 'Customers can order these',
+          },
+          {
+            icon: <IconPause width={18} height={18} />,
+            tone: 'gray',
+            label: 'Switched off',
+            value: all.length - onSale,
+            sub: 'Hidden at checkout',
+          },
+          {
+            icon: <IconAlert width={18} height={18} />,
+            tone: 'amber',
+            label: 'Low or sold out',
+            value: low,
+            highlight: low > 0,
+            sub: low ? 'Tap to show them' : 'Stock looks fine',
+            onClick: low ? () => setFilter('low') : undefined,
+          },
+        ]}
+      />
 
-      <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center">
-        <div className="relative md:w-72">
-          <IconSearch className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" />
-          <Input
-            type="search"
+      <Card
+        icon={<IconStack width={18} height={18} />}
+        tone="sky"
+        title="Stock by product"
+        description="Empty stock = made to order. Daily limit caps units per delivery day. City price overrides the base price here only."
+        bodyClassName="pt-4"
+        className="overflow-hidden"
+      >
+        <div className="flex flex-col gap-3 px-5 pb-4 md:flex-row md:items-center">
+          <Segmented<Filter>
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: 'all', label: 'All', count: all.length },
+              { value: 'on', label: 'On sale', count: onSale },
+              { value: 'off', label: 'Off', count: all.length - onSale },
+              { value: 'low', label: 'Low stock', count: low },
+            ]}
+          />
+          <SearchInput
             placeholder="Search products"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
+            className="md:ml-auto md:w-64"
           />
         </div>
-        <Segmented<Filter>
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: 'all', label: `All · ${all.length}` },
-            { value: 'on', label: `On sale · ${onSale}` },
-            { value: 'off', label: `Hidden · ${all.length - onSale}` },
-            { value: 'low', label: `Low stock · ${low}` },
-          ]}
-        />
-      </div>
-
-      <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-card">
-        <div className="hidden grid-cols-[minmax(0,1.4fr)_90px_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 border-b border-line bg-canvas/60 px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-muted lg:grid">
+        <div className="hidden grid-cols-[minmax(0,1.4fr)_90px_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 border-y border-line bg-subtle px-5 py-2.5 text-[11px] font-bold tracking-[0.08em] text-faint uppercase lg:grid">
           <span>Size</span>
           <span>On sale</span>
           <span>Stock</span>
@@ -202,9 +238,9 @@ export function InventoryPage() {
         ) : (
           groups.map(([product, variants]) => (
             <section key={product} className="border-b border-line last:border-b-0">
-              <div className="flex items-center gap-3 bg-canvas/40 px-5 pt-3 pb-1">
+              <div className="flex items-center gap-3 px-5 pt-3.5 pb-1">
                 <Thumb src={imageFor.get(variants[0]?.variantId ?? '') ?? null} />
-                <h3 className="font-display text-[15px] font-semibold text-ink">{product}</h3>
+                <h3 className="text-[15px] font-bold text-ink">{product}</h3>
               </div>
               {variants.map((r) => {
                 const d = draftOf(r);
@@ -266,7 +302,7 @@ export function InventoryPage() {
             </section>
           ))
         )}
-      </div>
+      </Card>
 
       <SaveBar
         show={changed > 0}
@@ -294,15 +330,6 @@ function MobileLabel({
     <div className={`flex min-w-0 flex-col gap-1 ${className}`}>
       <span className="text-[11px] font-semibold text-muted lg:hidden">{label}</span>
       {children}
-    </div>
-  );
-}
-
-function Legend({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="rounded-xl border border-line bg-white/60 px-4 py-3">
-      <div className="text-[13px] font-semibold text-ink">{title}</div>
-      <div className="text-xs text-muted">{body}</div>
     </div>
   );
 }

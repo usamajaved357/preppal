@@ -4,6 +4,42 @@ Newest entry on top. Every session appends one entry: Done / In progress / Next 
 
 ---
 
+## 2026-11-24 — Session 3: admin v2 design + full CRUD + storefront controls (Claude Code)
+**Done**
+- Studied the Selling Squads app + admin console (in Chrome) and rebuilt the admin design system to that level:
+  light canvas + inset white workspace with breadcrumbs, ⌘K "Jump to" palette, KPI stat strips, 20px cards with tinted
+  icon chips, pill buttons/tabs (brand-gradient active pill), option cards, step-numbered modals with live preview and
+  summary footer, "⋯" row menus, avatars. Every page restyled (DESIGN.md "Admin panel v2", ADR-012).
+- Full CRUD (API + UI), with guards documented in ADR-013 and logic in `services/admin.ts`:
+  - New **Categories** page: add/edit (photo upload, description, slug, position), reorder, show/hide, delete
+    (moves products to another category first when needed). "+" in the product editor creates one inline.
+  - Products: delete, duplicate (copies sizes, opens as draft), publish/hide from the list; delete individual sizes.
+  - Delivery areas: delete (blocked if on orders). New **Cities** card: add/edit/turn on/off/delete (owner).
+  - Team: remove admins (not yourself / last owner), remove riders (blocked if on orders), order counts shown.
+  - Usage counts on list endpoints (products per category, orders per area/rider, areas per city).
+- Storefront controls (ADR-014): Settings → **Pause orders** (+ customer message; API refuses `orders_paused`) and
+  **Announcement bar**; storefront top bar / hero / trust strip / checkout read them, plus cutoff hour and city name
+  from settings instead of hard-coded "11 PM"/"Sahiwal". Header **search now works** (filters the menu, results bar,
+  clear button, empty state); selected category tile gets a ring.
+- Tests: `packages/shared/src/schemas.test.ts` (old settings still parse, announcement limit, moveTo). Every new
+  endpoint exercised against local D1 with curl; UI loops verified in the browser (create+delete category,
+  duplicate+delete product, announcement + pause reflected on storefront and checkout). All admin and storefront
+  routes load with no console errors. `pnpm typecheck`, `pnpm test`, `pnpm lint`, `pnpm build` pass.
+
+**In progress**
+- Nothing.
+
+**Next**
+1. Integration tests for `createOrder` and the delete guards with `@cloudflare/vitest-pool-workers`.
+2. Manual order entry in admin (for WhatsApp/phone orders) and editing an order's items.
+3. Hero slides / feature copy managed from admin; R2 cleanup for unused uploads.
+
+**Blockers / notes**
+- Local demo data from Session 2 is still in `.wrangler/state` (reset command in Session 2 notes).
+- Settings were restored after testing (not paused, no announcement).
+
+---
+
 ## 2026-11-24 — Session 2: admin panel redesign (Claude Code)
 **Done**
 - Local setup: pnpm via corepack, `pnpm install`, local D1 migrated + seeded, `.claude/launch.json` for api/web/admin dev servers.

@@ -28,7 +28,7 @@ apps/
     src/env.ts              Bindings / Variables types
     src/lib/                errors, validate, settings, notify, images, ids, audit
     src/middleware/         admin-auth (Cloudflare Access)
-    src/services/           business logic: catalog.ts, orders.ts  ← keep logic here
+    src/services/           business logic: catalog.ts, orders.ts, admin.ts (deletes + usage counts)  ← keep logic here
     src/routes/public/      catalog (settings, cities, categories, products), orders (create, track, notify), images
     src/routes/admin/       catalog (categories/products/variants), inventory, orders (+prep list), setup (cities, areas, riders, admins, settings, uploads)
   web/        Storefront
@@ -39,14 +39,14 @@ apps/
     public/images/          logo, product photos (from Preppal Instagram), stock photos (Unsplash)
   admin/      Admin panel
     worker/index.ts         edge proxy
-    src/components/         Shell (grouped sidebar / mobile menu), ui (buttons, fields, toggle, segmented, badge…),
-                            overlays (toasts, confirm dialog, modal, drawer, sticky SaveBar), icons
+    src/components/         Shell (sidebar, top bar, breadcrumbs), nav.ts, CommandPalette (⌘K), overlays (toasts,
+                            confirm, Modal, Drawer, RowMenu, SaveBar), ui/ (controls + display kit), icons
     src/lib/                api client + row types, me (signed-in admin), site (storefront URL, phone/money/hour helpers), image
-    src/routes/orders/      OrdersPage (day picker, KPIs, filters, search), OrderList, OrderDrawer (detail, rider, COD,
-                            timeline), PrepList (+print), status.ts (tones, action labels, useOrderActions)
-    src/routes/products/    ProductsPage (grid + filters), ProductEditPage, ProductSidebar, PhotosCard, VariantsCard
+    src/routes/orders/      OrdersPage (greeting hero, KPI strip, tabs, search), OrderList, OrderDrawer, PrepList, status.ts
+    src/routes/products/    ProductsPage, ProductEditPage, ProductSidebar, PhotosCard, VariantsCard, actions.ts (delete/duplicate/publish)
+    src/routes/categories/  CategoriesPage (reorder, show/hide, move-and-delete), CategoryModal (also used from the product editor)
     src/routes/Inventory.tsx  grouped by product, edits batched behind one "Save all" bar
-    src/routes/setup/       Areas, Team (admins + riders, modals), Settings (live preview, email chips)
+    src/routes/setup/       Areas (+ Cities card), Team (admins + riders), Settings (pause orders, announcement, cutoff…)
     public/images → ../../web/public/images   symlink so seed photos load in admin too (ADR-011)
 packages/
   shared/     Zod schemas, DTO types, order status machine, time + money helpers, constants

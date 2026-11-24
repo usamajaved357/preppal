@@ -134,7 +134,12 @@ export function Modal({
   useEscape(onClose);
   return (
     <div className="fixed inset-0 z-[60] grid animate-fade place-items-center bg-ink/35 p-3 backdrop-blur-[3px] sm:p-6">
-      <button type="button" aria-label="Close" className="absolute inset-0 cursor-default" onClick={onClose} />
+      <button
+        type="button"
+        aria-label="Close"
+        className="absolute inset-0 cursor-default"
+        onClick={onClose}
+      />
       <div
         role="dialog"
         aria-modal="true"
@@ -174,7 +179,12 @@ export function Drawer({
   useEscape(onClose);
   return (
     <div className="fixed inset-0 z-50 animate-fade bg-ink/30 backdrop-blur-[2px]" data-print-hide>
-      <button type="button" aria-label="Close" className="absolute inset-0 cursor-default" onClick={onClose} />
+      <button
+        type="button"
+        aria-label="Close"
+        className="absolute inset-0 cursor-default"
+        onClick={onClose}
+      />
       <aside
         role="dialog"
         aria-modal="true"
@@ -219,7 +229,11 @@ export function SaveBar({
         </span>
         <div className="flex gap-1.5">
           {onDiscard && (
-            <Button variant="ghost" className="text-white/70 hover:bg-white/10 hover:text-white" onClick={onDiscard}>
+            <Button
+              variant="ghost"
+              className="text-white/70 hover:bg-white/10 hover:text-white"
+              onClick={onDiscard}
+            >
               Discard
             </Button>
           )}
@@ -245,6 +259,7 @@ export interface MenuItem {
 /** "⋯" button that opens a small menu of row actions (Edit, Duplicate, Delete…). */
 export function RowMenu({ items, label = 'More actions' }: { items: MenuItem[]; label?: string }) {
   const [open, setOpen] = useState(false);
+  const [up, setUp] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;
@@ -269,6 +284,9 @@ export function RowMenu({ items, label = 'More actions' }: { items: MenuItem[]; 
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          // Flip upward when there isn't room for the menu below the button.
+          const rect = ref.current?.getBoundingClientRect();
+          setUp(!!rect && rect.bottom + 48 * items.length + 24 > window.innerHeight);
           setOpen(!open);
         }}
       >
@@ -277,7 +295,7 @@ export function RowMenu({ items, label = 'More actions' }: { items: MenuItem[]; 
       {open && (
         <div
           role="menu"
-          className="absolute top-9 right-0 z-40 w-52 animate-rise overflow-hidden rounded-2xl border border-line bg-surface p-1.5 shadow-pop"
+          className={`absolute right-0 z-40 w-52 animate-rise ${up ? 'bottom-9' : 'top-9'} overflow-hidden rounded-2xl border border-line bg-surface p-1.5 shadow-pop`}
         >
           {items.map((it) => (
             <button

@@ -5,7 +5,8 @@ import { HeroSlideshow } from '../components/HeroSlideshow';
 import { IconCheck } from '../components/icons';
 import { ProductCard } from '../components/ProductCard';
 import { api, q } from '../lib/api';
-import { INSTAGRAM_TILES, STEPS, TRUST_POINTS } from '../lib/site';
+import { useSearch } from '../lib/search';
+import { formatHour, INSTAGRAM_TILES, STEPS, TRUST_POINTS } from '../lib/site';
 
 export function HomePage() {
   const settings = useQuery(q.settings());
@@ -17,7 +18,19 @@ export function HomePage() {
     const used = new Set(products.data?.map((p) => p.categorySlug));
     return [{ slug: 'all', name: 'All' }, ...(categories.data ?? []).filter((c) => used.has(c.slug))];
   }, [categories.data, products.data]);
-  const visible = (products.data ?? []).filter((p) => filter === 'all' || p.categorySlug === filter);
+  const query = useSearch((st) => st.query);
+  const setQuery = useSearch((st) => st.setQuery);
+  const needle = query.trim().toLowerCase();
+  const visible = (products.data ?? []).filter(
+    (p) =>
+      (filter === 'all' || p.categorySlug === filter) &&
+      (!needle || `${p.name} ${p.shortDescription}`.toLowerCase().includes(needle)),
+  );
+  const cutoff = formatHour(settings.data?.cutoffHour ?? 23);
+  const by = settings.data?.deliveryByLabel ?? '5 PM';
+  const trust = TRUST_POINTS.map((t) =>
+    t.title === 'Next-day delivery' ? { ...t, body: `Order by ${cutoff}, get it by ${by}` } : t,
+  );
 
   return (
     <>
@@ -54,11 +67,16 @@ export function HomePage() {
                 Order on WhatsApp
               </a>
             </div>
-            {settings.data && (
-              <div className="mt-2">
-                <CutoffCountdown msUntilCutoff={settings.data.msUntilCutoff} />
-              </div>
-            )}
+            {settings.data &&
+              (settings.data.ordersPaused ? (
+                <div className="mt-2 max-w-[470px] rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-[15px] backdrop-blur">
+                  <strong className="text-sage">Ordering is paused.</strong> {settings.data.pauseMessage}
+                </div>
+              ) : (
+                <div className="mt-2">
+                  <CutoffCountdown msUntilCutoff={settings.data.msUntilCutoff} />
+                </div>
+              ))}
           </div>
         </div>
       </section>
@@ -66,7 +84,7 @@ export function HomePage() {
       {/* Trust */}
       <section className="border-b border-line bg-white">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-6 py-5 sm:grid-cols-2 lg:grid-cols-4">
-          {TRUST_POINTS.map((t) => (
+          {trust.map((t) => (
             <div key={t.title} className="flex items-center gap-3">
               <span className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-full bg-sage-soft text-forest">
                 <IconCheck />
@@ -95,7 +113,9 @@ export function HomePage() {
               }}
               className="group flex flex-col items-center gap-3 text-center"
             >
-              <span className="block h-[132px] w-[132px] overflow-hidden rounded-full bg-sand shadow-[0_10px_24px_rgba(22,58,44,.14)]">
+              <span
+                className={`block h-[132px] w-[132px] overflow-hidden rounded-full bg-sand shadow-[0_10px_24px_rgba(22,58,44,.14)] ring-offset-4 ring-offset-cream transition ${filter === c.slug ? 'ring-3 ring-forest' : 'group-hover:ring-2 group-hover:ring-sage'}`}
+              >
                 {c.imageUrl && (
                   <img
                     src={c.imageUrl}
@@ -136,7 +156,31 @@ export function HomePage() {
             ))}
           </div>
         </div>
+        {needle && (
+          <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl bg-sage-soft px-4 py-3 text-[15px]">
+            <span>
+              {visible.length} result{visible.length === 1 ? '' : 's'} for <strong>“{query.trim()}”</strong>
+            </span>
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              className="ml-auto font-semibold text-forest underline underline-offset-2"
+            >
+              Clear search
+            </button>
+          </div>
+        )}
         {products.isLoading && <p className="text-muted">Loading tomorrow's menu…</p>}
+        {!products.isLoading && visible.length === 0 && (
+          <div className="rounded-3xl border border-dashed border-[#DDD6C7] bg-white px-6 py-14 text-center">
+            <p className="font-display text-2xl font-semibold">Nothing here yet</p>
+            <p className="mt-1 text-muted">
+              {needle
+                ? 'Try another word, or ask us on WhatsApp — we prep to order.'
+                : 'Check back soon for this category.'}
+            </p>
+          </div>
+        )}
         {products.isError && <p className="text-terra">Could not load the menu. Please refresh.</p>}
         <div className="grid grid-cols-[repeat(auto-fill,minmax(282px,1fr))] gap-6">
           {visible.map((p) => (
@@ -161,8 +205,8 @@ export function HomePage() {
           alt="Chicken karahi cooking"
           kicker="Always fresh"
           title="We take tomorrow's orders tonight — because we only sell fresh."
-          body="Order before 11 PM. Your items are prepared the next morning and reach your door by 5 PM. Pay the rider in cash."
-          chips={['Order by 11 PM', 'At your door by 5 PM']}
+          body={`Order before ${cutoff}. Your items are prepared the next morning and reach your door by ${by}. Pay the rider in cash.`}
+          chips={[`Order by ${cutoff}`, `At your door by ${by}`]}
         />
       </section>
 

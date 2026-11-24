@@ -1,5 +1,6 @@
 import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
 import { Shell } from './components/Shell';
+import { CategoriesPage } from './routes/categories/CategoriesPage';
 import { InventoryPage } from './routes/Inventory';
 import { OrdersPage } from './routes/orders/OrdersPage';
 import { ProductEditPage } from './routes/products/ProductEditPage';
@@ -15,6 +16,7 @@ export const router = createRouter({
     createRoute({ getParentRoute: () => root, path: '/', component: OrdersPage }),
     createRoute({ getParentRoute: () => root, path: '/products', component: ProductsPage }),
     createRoute({ getParentRoute: () => root, path: '/products/$id', component: ProductEditPage }),
+    createRoute({ getParentRoute: () => root, path: '/categories', component: CategoriesPage }),
     createRoute({ getParentRoute: () => root, path: '/inventory', component: InventoryPage }),
     createRoute({ getParentRoute: () => root, path: '/areas', component: AreasPage }),
     createRoute({ getParentRoute: () => root, path: '/team', component: TeamPage }),

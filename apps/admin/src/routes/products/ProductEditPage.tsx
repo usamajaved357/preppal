@@ -2,8 +2,16 @@ import { formatPkr } from '@preppal/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { IconChevronLeft, IconExternal } from '../../components/icons';
-import { SaveBar, useFeedback } from '../../components/overlays';
+import {
+  IconBox,
+  IconChevronLeft,
+  IconCopy,
+  IconEdit,
+  IconExternal,
+  IconTag,
+  IconTrash,
+} from '../../components/icons';
+import { RowMenu, SaveBar, useFeedback } from '../../components/overlays';
 import {
   Badge,
   Button,
@@ -17,6 +25,7 @@ import {
 } from '../../components/ui';
 import { type AdminCategory, type AdminProduct, get, send } from '../../lib/api';
 import { STOREFRONT_URL } from '../../lib/site';
+import { useProductActions } from './actions';
 import { type Photo, PhotosCard } from './PhotosCard';
 import { ProductSidebar } from './ProductSidebar';
 import { STATUS_META } from './ProductsPage';
@@ -63,6 +72,7 @@ export function ProductEditPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { toast } = useFeedback();
+  const { askDelete, duplicate } = useProductActions();
   const cats = useQuery({
     queryKey: ['categories'],
     queryFn: () => get<AdminCategory[]>('/admin/categories'),
@@ -113,31 +123,32 @@ export function ProductEditPage() {
 
   return (
     <>
-      <Link
-        to="/products"
-        className="mb-3 inline-flex items-center gap-1 text-sm font-semibold text-muted hover:text-forest"
-      >
-        <IconChevronLeft width={16} height={16} /> All products
-      </Link>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-[28px] leading-tight font-semibold text-forest md:text-[32px]">
-              {isNew ? 'New product' : initial.name}
-            </h1>
-            {!isNew && (
-              <Badge tone={STATUS_META[initial.status].tone} dot>
-                {STATUS_META[initial.status].label}
-              </Badge>
-            )}
-          </div>
-          {isNew && (
-            <p className="mt-1.5 text-sm text-muted">
-              Fill in the basics and save — then add sizes and prices.
+        <div className="flex min-w-0 items-center gap-3.5">
+          <Link
+            to="/products"
+            aria-label="All products"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line bg-surface text-muted shadow-card transition hover:text-ink"
+          >
+            <IconChevronLeft width={18} height={18} />
+          </Link>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="truncate text-[26px] leading-tight font-bold text-ink">
+                {isNew ? 'New product' : initial.name}
+              </h1>
+              {!isNew && (
+                <Badge tone={STATUS_META[initial.status].tone} dot>
+                  {STATUS_META[initial.status].label}
+                </Badge>
+              )}
+            </div>
+            <p className="mt-0.5 text-sm text-muted">
+              {isNew ? 'Fill in the basics and create it — then add sizes and prices.' : `/p/${initial.slug}`}
             </p>
-          )}
+          </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           {!isNew && STOREFRONT_URL && initial.status === 'active' && (
             <a
               href={`${STOREFRONT_URL}/p/${initial.slug}`}
@@ -148,6 +159,24 @@ export function ProductEditPage() {
               <IconExternal width={16} height={16} /> View on site
             </a>
           )}
+          {!isNew && product.data && (
+            <RowMenu
+              items={[
+                {
+                  label: 'Duplicate',
+                  icon: <IconCopy width={16} height={16} />,
+                  onSelect: () => product.data && duplicate.mutate(product.data),
+                },
+                {
+                  label: 'Delete product',
+                  icon: <IconTrash width={16} height={16} />,
+                  danger: true,
+                  onSelect: () =>
+                    product.data && askDelete(product.data, () => navigate({ to: '/products' })),
+                },
+              ]}
+            />
+          )}
           <Button onClick={() => save.mutate()} disabled={!canSave || save.isPending || (!isNew && !dirty)}>
             {save.isPending ? 'Saving…' : isNew ? 'Create product' : 'Save'}
           </Button>
@@ -157,7 +186,12 @@ export function ProductEditPage() {
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="flex min-w-0 flex-col gap-5">
-          <Card title="Basics">
+          <Card
+            icon={<IconEdit width={18} height={18} />}
+            tone="sky"
+            title="Basics"
+            description="What customers see first."
+          >
             <div className="grid gap-4">
               <Field label="Product name">
                 <Input
@@ -193,7 +227,7 @@ export function ProductEditPage() {
           <PhotosCard photos={form.photos} onChange={(p) => set('photos', p)} />
 
           {isNew ? (
-            <Card title="Sizes & prices">
+            <Card icon={<IconTag width={18} height={18} />} tone="green" title="Sizes & prices">
               <p className="text-sm text-muted">
                 Create the product first — then you can add sizes like 250 g and 500 g here.
               </p>
@@ -209,6 +243,8 @@ export function ProductEditPage() {
           )}
 
           <Card
+            icon={<IconBox width={18} height={18} />}
+            tone="plum"
             title="Product page details"
             description="Optional sections customers see on the product page."
           >

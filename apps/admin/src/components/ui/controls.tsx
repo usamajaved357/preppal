@@ -240,7 +240,9 @@ export function OptionCard({
 /** Numbered step heading inside long forms and modals. */
 export const Step = ({ n, title }: { n: number; title: string }) => (
   <div className="flex items-center gap-2.5">
-    <span className="grid h-6 w-6 place-items-center rounded-full bg-ink text-xs font-bold text-white">{n}</span>
+    <span className="grid h-6 w-6 place-items-center rounded-full bg-ink text-xs font-bold text-white">
+      {n}
+    </span>
     <h3 className="text-[15px] font-bold text-ink">{title}</h3>
   </div>
 );

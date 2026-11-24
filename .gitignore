@@ -6,3 +6,12 @@ dist
 .turbo
 .DS_Store
 coverage
+
+# Local-only project notes and AI assistant files (kept on this machine, never pushed)
+docs/
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+plans/
+PLAN*.md
+*.plan.md

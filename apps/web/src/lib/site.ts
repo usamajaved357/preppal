@@ -62,3 +62,13 @@ export const BADGE_STYLE: Record<string, string> = {
   Limited: 'bg-terra text-white',
 };
 export const badgeClass = (badge: string) => BADGE_STYLE[badge] ?? 'bg-white text-forest';
+
+/** Hours 0–23 → "11 PM" (cutoff copy comes from admin settings). */
+export const formatHour = (h: number) => {
+  if (h === 0) return '12 midnight';
+  if (h === 12) return '12 noon';
+  return `${h % 12} ${h < 12 ? 'AM' : 'PM'}`;
+};
+
+/** "923285228505" → "0328 5228505" */
+export const formatWhatsapp = (n: string) => n.replace(/^92/, '0').replace(/^(\d{4})(\d+)$/, '$1 $2');

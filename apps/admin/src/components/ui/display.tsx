@@ -37,7 +37,9 @@ export function IconChip({
 }) {
   const s = { sm: 'h-8 w-8 rounded-lg', md: 'h-9 w-9 rounded-xl', lg: 'h-11 w-11 rounded-xl' }[size];
   return (
-    <span className={`grid shrink-0 place-items-center ring-1 ring-black/[0.04] ring-inset ${s} ${TONE[tone]}`}>
+    <span
+      className={`grid shrink-0 place-items-center ring-1 ring-black/[0.04] ring-inset ${s} ${TONE[tone]}`}
+    >
       {children}
     </span>
   );
@@ -50,7 +52,8 @@ export function Avatar({ name, className = '' }: { name: string; className?: str
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase() ?? '')
     .join('');
-  const tone = AVATAR_TONES[[...name].reduce((a, ch) => a + ch.charCodeAt(0), 0) % AVATAR_TONES.length] ?? 'gray';
+  const tone =
+    AVATAR_TONES[[...name].reduce((a, ch) => a + ch.charCodeAt(0), 0) % AVATAR_TONES.length] ?? 'gray';
   return (
     <span
       aria-hidden
@@ -82,7 +85,9 @@ export function Card({
   bodyClassName?: string;
 }) {
   return (
-    <section className={`rounded-[var(--radius-card)] border border-line bg-surface shadow-card ${className}`}>
+    <section
+      className={`rounded-[var(--radius-card)] border border-line bg-surface shadow-card ${className}`}
+    >
       {(title || actions) && (
         <header className="flex flex-wrap items-start justify-between gap-3 px-5 pt-5 pb-1">
           <div className="flex min-w-0 items-start gap-3">
@@ -130,7 +135,12 @@ export interface Stat {
   highlight?: boolean;
 }
 
-const LG_COLS: Record<number, string> = { 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4', 5: 'lg:grid-cols-5' };
+const LG_COLS: Record<number, string> = {
+  2: 'lg:grid-cols-2',
+  3: 'lg:grid-cols-3',
+  4: 'lg:grid-cols-4',
+  5: 'lg:grid-cols-5',
+};
 
 /** One card split into stat cells with dividers (KPI strip). */
 export function StatStrip({ stats, className = '' }: { stats: Stat[]; className?: string }) {
@@ -156,7 +166,12 @@ export function StatStrip({ stats, className = '' }: { stats: Stat[]; className?
         );
         const cls = `flex items-start gap-3 p-4 text-left md:p-5 ${i % 2 === 1 ? 'border-l border-line' : ''} ${i >= 2 ? 'border-t border-line lg:border-t-0' : ''} ${i > 0 ? 'lg:border-l' : ''}`;
         return s.onClick ? (
-          <button key={s.label} type="button" onClick={s.onClick} className={`${cls} transition hover:bg-subtle`}>
+          <button
+            key={s.label}
+            type="button"
+            onClick={s.onClick}
+            className={`${cls} transition hover:bg-subtle`}
+          >
             {body}
           </button>
         ) : (

@@ -39,6 +39,8 @@ export function PhotosCard({ photos, onChange }: { photos: Photo[]; onChange: (p
 
   return (
     <Card
+      icon={<IconImage width={18} height={18} />}
+      tone="amber"
       title="Photos"
       description="The first photo is the cover on the storefront. Images are resized in your browser before upload."
     >

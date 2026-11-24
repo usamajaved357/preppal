@@ -1,7 +1,9 @@
 import { PRODUCT_BADGES } from '@preppal/shared';
-import { IconImage } from '../../components/icons';
-import { Card, Field, Input, Select } from '../../components/ui';
+import { useState } from 'react';
+import { IconCheck, IconImage, IconPlus, IconSettings, IconSun } from '../../components/icons';
+import { Card, Field, Input, OptionCard, Select } from '../../components/ui';
 import type { AdminCategory } from '../../lib/api';
+import { CategoryModal, newCategoryDraft } from '../categories/CategoryModal';
 import { type Form, slugify } from './ProductEditPage';
 
 const STATUS_CHOICES = [
@@ -22,44 +24,57 @@ export function ProductSidebar({
   categories: AdminCategory[];
   priceLabel: string;
 }) {
+  const [newCat, setNewCat] = useState(false);
   return (
     <div className="flex flex-col gap-5">
-      <Card title="Visibility" bodyClassName="flex flex-col gap-2 p-4">
+      <Card
+        icon={<IconSun width={18} height={18} />}
+        tone="green"
+        title="Visibility"
+        bodyClassName="flex flex-col gap-2 p-4"
+      >
         {STATUS_CHOICES.map((s) => (
-          <label
+          <OptionCard
             key={s.value}
-            className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${
-              form.status === s.value
-                ? 'border-forest bg-sage-soft/60 ring-1 ring-forest'
-                : 'border-line hover:border-line-strong'
-            }`}
-          >
-            <input
-              type="radio"
-              name="status"
-              checked={form.status === s.value}
-              onChange={() => set('status', s.value)}
-              className="mt-1 accent-forest"
-            />
-            <span>
-              <span className="block text-sm font-semibold text-ink">{s.title}</span>
-              <span className="block text-xs text-muted">{s.body}</span>
-            </span>
-          </label>
+            selected={form.status === s.value}
+            title={s.title}
+            body={s.body}
+            onSelect={() => set('status', s.value)}
+          />
         ))}
       </Card>
 
-      <Card title="Organise" bodyClassName="flex flex-col gap-4 p-4">
-        <Field label="Category">
-          <Select value={form.categoryId} onChange={(e) => set('categoryId', e.target.value)}>
-            <option value="">Choose a category…</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-                {c.isActive ? '' : ' (hidden)'}
-              </option>
-            ))}
-          </Select>
+      <Card
+        icon={<IconSettings width={18} height={18} />}
+        tone="sky"
+        title="Organise"
+        bodyClassName="flex flex-col gap-4 p-4"
+      >
+        <Field label="Category" group>
+          <div className="flex gap-2">
+            <Select
+              aria-label="Category"
+              value={form.categoryId}
+              onChange={(e) => set('categoryId', e.target.value)}
+            >
+              <option value="">Choose a category…</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                  {c.isActive ? '' : ' (hidden)'}
+                </option>
+              ))}
+            </Select>
+            <button
+              type="button"
+              title="New category"
+              aria-label="New category"
+              onClick={() => setNewCat(true)}
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line-strong text-ink transition hover:bg-subtle"
+            >
+              <IconPlus width={16} height={16} />
+            </button>
+          </div>
         </Field>
         <Field label="Badge" hint="Small label on the photo">
           <Select
@@ -72,11 +87,11 @@ export function ProductSidebar({
             ))}
           </Select>
         </Field>
-        <div className="grid grid-cols-[1fr_96px] gap-3">
+        <div className="grid grid-cols-[1fr_88px] gap-3">
           <Field label="Web address" hint={`/p/${form.slug || '…'}`}>
             <Input value={form.slug} onChange={(e) => set('slug', slugify(e.target.value))} />
           </Field>
-          <Field label="Order" hint="Lower first">
+          <Field label="Position" hint="Lower first">
             <Input
               type="number"
               value={form.sortOrder}
@@ -86,18 +101,23 @@ export function ProductSidebar({
         </div>
       </Card>
 
-      <Card title="Preview" bodyClassName="p-4">
-        <div className="overflow-hidden rounded-xl border border-line">
+      <Card
+        icon={<IconCheck width={18} height={18} />}
+        tone="plum"
+        title="Storefront preview"
+        bodyClassName="p-4"
+      >
+        <div className="overflow-hidden rounded-2xl border border-line bg-cream">
           <div className="relative aspect-[4/3] bg-sand">
             {form.photos[0] ? (
               <img src={form.photos[0].url} alt="" className="h-full w-full object-cover" />
             ) : (
-              <div className="grid h-full place-items-center text-muted/50">
+              <div className="grid h-full place-items-center text-faint">
                 <IconImage width={32} height={32} />
               </div>
             )}
             {form.badge && (
-              <span className="absolute top-2 left-2 rounded-full bg-terra px-2 py-0.5 text-[11px] font-bold text-white">
+              <span className="absolute top-2 left-2 rounded-full bg-forest px-2.5 py-0.5 text-[11px] font-bold text-white">
                 {form.badge}
               </span>
             )}
@@ -109,6 +129,14 @@ export function ProductSidebar({
           </div>
         </div>
       </Card>
+
+      {newCat && (
+        <CategoryModal
+          initial={newCategoryDraft((categories.at(-1)?.sortOrder ?? 0) + 1)}
+          onClose={() => setNewCat(false)}
+          onSaved={(id) => set('categoryId', id)}
+        />
+      )}
     </div>
   );
 }

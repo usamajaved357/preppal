@@ -39,14 +39,25 @@ countdown). Real photography only — no illustrations.
 - `public/images/site/*` — Unsplash (free licence): chopping, karahi, mortar, spread, onions, spices, grill, thali.
 - Logo: `public/images/logo.png` (from Instagram profile; get the vector original).
 
-## Admin panel (redesigned 2026-11-24)
-- Extra tokens live only in `apps/admin/src/styles.css`: `canvas` (page bg), `line-strong` (input borders),
-  `nav-text`/`nav-muted` (sidebar), `terra-soft`/`terra-ink`, and soft/ink pairs for order statuses —
-  amber (received), sky (confirmed), plum (preparing), clay (out for delivery), sage (delivered), stone (cancelled),
-  terra (failed). Use `<Badge tone>` rather than raw classes.
-- Layout: dark forest sidebar grouped Daily / Catalog / Setup with a pending-orders count; collapses to a top bar +
-  menu on phones. Content max width 1280 px. Page header = gold kicker + Fraunces title + one-line subtitle.
-- Components (`components/ui.tsx`, `overlays.tsx`): Button (primary/secondary/ghost/danger, sm/md), Field, Input,
-  PrefixInput (Rs, @, +), Select, Textarea, Toggle, Segmented, Card, Badge, EmptyState, Skeleton, Avatar,
-  toasts, confirm dialog, Modal, Drawer, SaveBar. See ADR-012 for when to use which.
-- Printing: elements with `data-print-hide` are hidden; the prep list prints on its own via `printSection('prep')`.
+## Admin panel (v2, 2026-11-24 — modelled on the Selling Squads app/admin console)
+Light, airy "app" look: the sidebar sits on a pale canvas and every page lives in one white inset panel with a
+breadcrumb bar. Headings are DM Sans bold (Fraunces only for the Preppal wordmark). Brand green is the accent.
+- **Tokens** (`apps/admin/src/styles.css` only): `canvas` #F3F5F1, `surface` white, `subtle` #F7F8F5, `ink` #14201A
+  (text + dark pill buttons), `muted`, `faint`, `line`, `line-strong`; soft/ink tint pairs `sage-soft`, `amber-*`,
+  `sky-*`, `plum-*`, `clay-*`, `rose-*`, `terra-*`, `stone-soft`; `--radius-card` 20px; `shadow-card`, `shadow-pop`,
+  `shadow-pill`. Utility classes: `.pill-active` (brand gradient for the selected tab), `.hero-wash` (soft glow).
+- **Shell**: brand block, "Jump to… ⌘K" command palette, grouped nav (Daily / Catalog / Setup) with the active item
+  as a white raised pill and terra icon; top bar with breadcrumbs, "Taking orders / Orders paused" pill and
+  "Storefront ↗". Phones: top bar + slide-down menu.
+- **Kit** (`components/ui/controls.tsx`, `ui/display.tsx`, `overlays.tsx`):
+  - Buttons are pills: `primary` (ink), `brand` (forest), `secondary`, `ghost`, `danger`; `ButtonIcon` puts a "+" in a
+    small circle on create buttons.
+  - `Card` with tinted `IconChip` + title + description; `StatStrip` = one KPI card split into cells;
+    `PageHeader`; `Badge` (dot variant for status); `Avatar` (tinted initials); `EmptyState`; `Skeleton`.
+  - `Segmented` pill tabs with counts; `SearchInput` (round); `OptionCard` (choice card with check badge); `Step`
+    (numbered form step); `Toggle` (ink when on); `Field`, `Input`, `PrefixInput`, `Select`, `Textarea`.
+  - `Modal` (title + description, scrolling body, footer bar with summary left / actions right), `Drawer`,
+    `RowMenu` ("⋯" actions, flips upward near the bottom), `SaveBar` (dark pill), toasts + confirm dialog.
+- Create/edit dialogs follow the "promo code" pattern: numbered steps on the left, live storefront preview on the
+  right (see `CategoryModal`).
+- Printing: `data-print-hide` hides chrome; `printSection('prep')` prints only the prep list.

@@ -53,7 +53,8 @@ export async function deleteCategory(db: Db, id: string, moveTo?: string): Promi
     });
   }
   if (n > 0 && moveTo) {
-    if (moveTo === id) throw new HttpError(400, 'bad_target', 'Pick a different category to move products to');
+    if (moveTo === id)
+      throw new HttpError(400, 'bad_target', 'Pick a different category to move products to');
     const [target] = await db.select().from(categories).where(eq(categories.id, moveTo)).limit(1);
     if (!target) throw notFound('Target category');
     await db.batch([
@@ -79,14 +80,21 @@ export async function deleteProduct(db: Db, id: string): Promise<void> {
   const dropProduct = db.delete(products).where(eq(products.id, id));
   const dropVariants = db.delete(productVariants).where(eq(productVariants.productId, id));
   if (variantIds.length) {
-    await db.batch([db.delete(inventory).where(inArray(inventory.variantId, variantIds)), dropVariants, dropProduct]);
+    await db.batch([
+      db.delete(inventory).where(inArray(inventory.variantId, variantIds)),
+      dropVariants,
+      dropProduct,
+    ]);
   } else {
     await db.batch([dropVariants, dropProduct]);
   }
 }
 
 export async function deleteVariant(db: Db, id: string): Promise<void> {
-  const [v] = await db.select({ id: productVariants.id }).from(productVariants).where(eq(productVariants.id, id));
+  const [v] = await db
+    .select({ id: productVariants.id })
+    .from(productVariants)
+    .where(eq(productVariants.id, id));
   if (!v) throw notFound('Size');
   await db.batch([
     db.delete(inventory).where(eq(inventory.variantId, id)),
@@ -96,7 +104,9 @@ export async function deleteVariant(db: Db, id: string): Promise<void> {
 
 /** Areas and riders that appear on orders can't be removed (orders keep the link) — turn them off instead. */
 export async function deleteArea(db: Db, id: string): Promise<void> {
-  const [{ n }] = (await db.select({ n: count() }).from(orders).where(eq(orders.areaId, id))) as [{ n: number }];
+  const [{ n }] = (await db.select({ n: count() }).from(orders).where(eq(orders.areaId, id))) as [
+    { n: number },
+  ];
   if (n > 0) {
     throw inUse('area_in_use', `This area is on ${n} order${n === 1 ? '' : 's'}. Turn it off instead.`, {
       orderCount: n,
@@ -106,7 +116,9 @@ export async function deleteArea(db: Db, id: string): Promise<void> {
 }
 
 export async function deleteRider(db: Db, id: string): Promise<void> {
-  const [{ n }] = (await db.select({ n: count() }).from(orders).where(eq(orders.riderId, id))) as [{ n: number }];
+  const [{ n }] = (await db.select({ n: count() }).from(orders).where(eq(orders.riderId, id))) as [
+    { n: number },
+  ];
   if (n > 0) {
     throw inUse('rider_in_use', `This rider is on ${n} order${n === 1 ? '' : 's'}. Turn them off instead.`, {
       orderCount: n,
@@ -121,19 +133,27 @@ export async function deleteCity(db: Db, id: string): Promise<void> {
     db.select({ n: count() }).from(orders).where(eq(orders.cityId, id)),
   ]);
   if ((a?.n ?? 0) > 0 || (o?.n ?? 0) > 0) {
-    throw inUse('city_in_use', 'Remove this city’s delivery areas first. Cities with orders can only be turned off.', {
-      areaCount: a?.n ?? 0,
-      orderCount: o?.n ?? 0,
-    });
+    throw inUse(
+      'city_in_use',
+      'Remove this city’s delivery areas first. Cities with orders can only be turned off.',
+      {
+        areaCount: a?.n ?? 0,
+        orderCount: o?.n ?? 0,
+      },
+    );
   }
-  await db.batch([db.delete(inventory).where(eq(inventory.cityId, id)), db.delete(cities).where(eq(cities.id, id))]);
+  await db.batch([
+    db.delete(inventory).where(eq(inventory.cityId, id)),
+    db.delete(cities).where(eq(cities.id, id)),
+  ]);
 }
 
 /** Owner can remove admins, but never themselves or the last active owner. */
 export async function deleteAdmin(db: Db, id: string, actorEmail: string): Promise<void> {
   const [target] = await db.select().from(adminUsers).where(eq(adminUsers.id, id)).limit(1);
   if (!target) throw notFound('Admin');
-  if (target.email === actorEmail) throw new HttpError(400, 'cannot_remove_self', "You can't remove yourself");
+  if (target.email === actorEmail)
+    throw new HttpError(400, 'cannot_remove_self', "You can't remove yourself");
   if (target.role === 'owner') {
     const [{ n }] = (await db
       .select({ n: count() })

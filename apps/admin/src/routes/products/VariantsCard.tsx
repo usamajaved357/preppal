@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { IconPlus } from '../../components/icons';
+import { IconPlus, IconTag, IconTrash } from '../../components/icons';
 import { useFeedback } from '../../components/overlays';
-import { Badge, Button, Card, Input, PrefixInput, Toggle } from '../../components/ui';
+import { Badge, Button, Card, IconButton, Input, PrefixInput, Toggle } from '../../components/ui';
 import { type AdminVariant, send } from '../../lib/api';
 
 const EMPTY = { label: '', sku: '', pricePkr: 0, unitNote: '' };
@@ -17,7 +17,7 @@ export function VariantsCard({
   skuHint: string;
 }) {
   const qc = useQueryClient();
-  const { toast } = useFeedback();
+  const { toast, confirm } = useFeedback();
   const [adding, setAdding] = useState(variants.length === 0);
   const [draft, setDraft] = useState(EMPTY);
   const refresh = () =>
@@ -50,8 +50,19 @@ export function VariantsCard({
     onError: (e: Error) => toast(e.message, 'error'),
   });
 
+  const remove = useMutation({
+    mutationFn: (v: AdminVariant) => send('DELETE', `/admin/variants/${v.id}`),
+    onSuccess: async (_r, v) => {
+      toast(`Size “${v.label}” deleted`);
+      await refresh();
+    },
+    onError: (e: Error) => toast(e.message, 'error'),
+  });
+
   return (
     <Card
+      icon={<IconTag width={18} height={18} />}
+      tone="green"
       title="Sizes & prices"
       description="Each size is a separate option customers can pick. Stock per city is set under Inventory."
       actions={
@@ -61,9 +72,9 @@ export function VariantsCard({
           </Button>
         )
       }
-      bodyClassName="p-0"
+      bodyClassName="pt-4"
     >
-      <div className="hidden grid-cols-[1.1fr_1fr_1fr_1fr_120px] gap-3 border-b border-line bg-canvas/60 px-5 py-2 text-[11px] font-bold uppercase tracking-[0.08em] text-muted md:grid">
+      <div className="hidden grid-cols-[1.1fr_1fr_1fr_1fr_150px] gap-3 border-y border-line bg-subtle px-5 py-2 text-[11px] font-bold tracking-[0.08em] text-faint uppercase md:grid">
         <span>Size</span>
         <span>Price</span>
         <span>SKU</span>
@@ -72,12 +83,25 @@ export function VariantsCard({
       </div>
       <ul className="divide-y divide-line">
         {variants.map((v) => (
-          <VariantRow key={`${v.id}-${v.pricePkr}-${v.isActive}`} v={v} onSave={(nv) => update.mutate(nv)} />
+          <VariantRow
+            key={`${v.id}-${v.pricePkr}-${v.isActive}`}
+            v={v}
+            onSave={(nv) => update.mutate(nv)}
+            onDelete={async () => {
+              const ok = await confirm({
+                title: `Delete size “${v.label}”?`,
+                body: 'Customers will no longer see this size. Past orders keep their details. To hide it for now, switch “On sale” off instead.',
+                confirmLabel: 'Delete size',
+                danger: true,
+              });
+              if (ok) remove.mutate(v);
+            }}
+          />
         ))}
       </ul>
       {adding && (
         <div className="border-t border-line bg-sage-soft/40 px-5 py-4">
-          <div className="grid gap-3 md:grid-cols-[1.1fr_1fr_1fr_1fr_120px] md:items-center">
+          <div className="grid gap-3 md:grid-cols-[1.1fr_1fr_1fr_1fr_150px] md:items-center">
             <Input
               aria-label="Size"
               placeholder="e.g. 250 g"
@@ -132,12 +156,20 @@ export function VariantsCard({
   );
 }
 
-function VariantRow({ v, onSave }: { v: AdminVariant; onSave: (v: AdminVariant) => void }) {
+function VariantRow({
+  v,
+  onSave,
+  onDelete,
+}: {
+  v: AdminVariant;
+  onSave: (v: AdminVariant) => void;
+  onDelete: () => void;
+}) {
   const [row, setRow] = useState(v);
   const dirty = JSON.stringify(row) !== JSON.stringify(v);
   return (
     <li className={`px-5 py-3 ${dirty ? 'bg-sage-soft/40' : ''}`}>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-[1.1fr_1fr_1fr_1fr_120px] md:items-center">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-[1.1fr_1fr_1fr_1fr_150px] md:items-center">
         <div className="col-span-2 flex items-center gap-2 md:col-span-1">
           <Input
             aria-label="Size"
@@ -177,6 +209,13 @@ function VariantRow({ v, onSave }: { v: AdminVariant; onSave: (v: AdminVariant) 
           ) : (
             row.pricePkr <= 0 && row.isActive && <Badge tone="amber">No price</Badge>
           )}
+          <IconButton
+            label={`Delete ${v.label}`}
+            onClick={onDelete}
+            className="ml-auto hover:!bg-rose-soft hover:!text-rose-ink"
+          >
+            <IconTrash width={16} height={16} />
+          </IconButton>
         </div>
       </div>
     </li>

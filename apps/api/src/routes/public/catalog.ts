@@ -1,5 +1,10 @@
 import { cities, deliveryAreas } from '@preppal/db';
-import { availableDeliveryDates, DEFAULT_SETTINGS, msUntilCutoff, type PublicSettingsDto } from '@preppal/shared';
+import {
+  availableDeliveryDates,
+  DEFAULT_SETTINGS,
+  msUntilCutoff,
+  type PublicSettingsDto,
+} from '@preppal/shared';
 import { and, asc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { z } from 'zod';

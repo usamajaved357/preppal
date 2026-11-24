@@ -69,11 +69,21 @@ export function CheckoutPage() {
     place.mutate();
   };
   const err = place.error instanceof ApiError ? place.error : null;
+  const paused = !!settings.data?.ordersPaused;
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <h1 className="text-[44px] font-semibold">Almost there</h1>
       <p className="mb-7 text-muted">Tell us where to bring it. You pay cash when it arrives.</p>
+      {paused && (
+        <div
+          role="status"
+          className="mb-6 rounded-2xl border border-terra/25 bg-[#FBEAE3] px-5 py-4 text-[#7A2E12]"
+        >
+          <strong className="block font-semibold">Ordering is paused right now</strong>
+          {settings.data?.pauseMessage}
+        </div>
+      )}
       <form onSubmit={onSubmit} className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[999_1_560px] flex-col gap-5">
           <section className={card}>
@@ -230,10 +240,10 @@ export function CheckoutPage() {
           )}
           <button
             type="submit"
-            disabled={place.isPending}
+            disabled={place.isPending || paused}
             className="h-[58px] rounded-full bg-forest text-[17px] font-bold text-white disabled:opacity-60"
           >
-            {place.isPending ? 'Placing order…' : 'Place order'}
+            {paused ? 'Ordering paused' : place.isPending ? 'Placing order…' : 'Place order'}
           </button>
           <p className="rounded-[14px] bg-[#F7EFE4] p-3.5 text-sm leading-relaxed text-[#5A3A14]">
             We take orders a night ahead because we only sell fresh. We'll confirm on WhatsApp.

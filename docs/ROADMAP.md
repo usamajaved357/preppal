@@ -19,12 +19,15 @@ Legend: `[x]` done · `[ ]` todo · `[~]` partly done. Update this file at the e
 - [x] Admin: orders board + prep list, products (+variants, uploads), inventory, areas, settings, team
 - [ ] **Preppal to supply**: real prices + pack sizes, delivery areas + fees, owner/admin emails, original product photos (no text)
 - [ ] Integration tests for `createOrder` using `@cloudflare/vitest-pool-workers` (stock race, daily limit, cutoff edge)
-- [ ] Search box in header (currently visual only) → filter products client-side
+- [x] Search box in header → filters the home menu client-side
 - [ ] Category page `/c/$slug` (currently category tiles filter the home menu)
 - [ ] 404 page + error boundary in both apps
 - [ ] Product images responsive sizes (`srcset`) once real photos arrive
 
 - [x] Admin UI redesign: navigation, order drawer + timeline, product editor, batched inventory, setup modals, mobile layout
+- [x] Admin v2 design (Selling Squads level) + full CRUD: categories page, delete/duplicate products, delete sizes,
+      areas, riders, admins, cities management
+- [x] Storefront controls from admin: pause orders (+ message), announcement bar, cutoff/city copy from settings
 
 ## P2 — Launch
 - [ ] Buy domain, add to Cloudflare, custom domains for web + admin (docs/DEPLOY.md)
@@ -37,7 +40,7 @@ Legend: `[x]` done · `[ ]` todo · `[~]` partly done. Update this file at the e
 
 ## P3 — Merchandising
 - [ ] Deal bundles as products with limited daily quantity (schema already supports via daily_limit)
-- [ ] Home banners managed from admin (currently `apps/web/src/lib/site.ts`)
+- [~] Home banners managed from admin — announcement bar done; hero slides still in `apps/web/src/lib/site.ts`
 - [ ] Coming-soon products with "Notify me" (API `/notify` exists)
 - [ ] Recipes section (from Instagram "preppal recipes" highlight)
 

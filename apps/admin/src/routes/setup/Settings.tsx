@@ -1,18 +1,30 @@
-import type { Settings } from '@preppal/shared';
+import { DEFAULT_SETTINGS, type Settings } from '@preppal/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type ReactNode, useEffect, useState } from 'react';
-import { IconClock, IconX } from '../../components/icons';
+import {
+  IconCheck,
+  IconClock,
+  IconMegaphone,
+  IconPause,
+  IconPhone,
+  IconSettings,
+  IconX,
+} from '../../components/icons';
 import { SaveBar, useFeedback } from '../../components/overlays';
 import {
   ErrorNote,
   Field,
+  IconChip,
   Input,
   inputCls,
+  OptionCard,
   PageHeader,
   PrefixInput,
   Segmented,
   Select,
   Skeleton,
+  Textarea,
+  type Tone,
 } from '../../components/ui';
 import { get, send } from '../../lib/api';
 import { useMe } from '../../lib/me';
@@ -37,7 +49,7 @@ export function SettingsPage() {
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ['settings'] });
       await qc.invalidateQueries({ queryKey: ['public-settings'] });
-      toast('Settings saved');
+      toast('Settings saved — the storefront updates right away');
     },
   });
 
@@ -56,16 +68,16 @@ export function SettingsPage() {
     if (e && !form.alertEmails.includes(e)) set('alertEmails', [...form.alertEmails, e]);
     setEmailInput('');
   };
+  const defaultBar = `Order by ${formatHour(form.cutoffHour)} for delivery tomorrow by ${form.deliveryByLabel} · Cash on delivery`;
 
   return (
     <>
       <PageHeader
-        kicker="Setup"
         title="Settings"
-        subtitle="How ordering works on the storefront, and where new-order alerts go."
+        subtitle="How ordering works on the storefront, what customers see, and where alerts go."
       />
       {readOnly && (
-        <p className="mb-5 rounded-xl border border-line bg-white px-4 py-3 text-sm text-muted">
+        <p className="mb-5 rounded-2xl border border-line bg-subtle px-4 py-3 text-sm text-muted">
           You can view these settings. Only the owner can change them.
         </p>
       )}
@@ -73,10 +85,89 @@ export function SettingsPage() {
 
       <fieldset disabled={readOnly} className="flex max-w-5xl flex-col gap-5">
         <Section
-          title="Ordering window"
-          body="When the order cutoff is, and how far ahead customers can book."
+          icon={<IconPause width={18} height={18} />}
+          tone="amber"
+          title="Taking orders"
+          body="Pause new orders for holidays or when you're sold out. The storefront stays open to browse."
         >
-          <div className="flex items-start gap-3 rounded-xl bg-forest px-4 py-3.5 text-sm text-white">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <OptionCard
+              selected={!form.ordersPaused}
+              title="Taking orders"
+              body="Checkout works as normal"
+              icon={
+                <IconChip tone="green" size="sm">
+                  <IconCheck width={15} height={15} />
+                </IconChip>
+              }
+              onSelect={() => set('ordersPaused', false)}
+            />
+            <OptionCard
+              selected={form.ordersPaused}
+              title="Paused"
+              body="Customers see your message instead of checkout"
+              icon={
+                <IconChip tone="amber" size="sm">
+                  <IconPause width={15} height={15} />
+                </IconChip>
+              }
+              onSelect={() => set('ordersPaused', true)}
+            />
+          </div>
+          {form.ordersPaused && (
+            <Field label="Message for customers" hint={`${form.pauseMessage.length}/200`}>
+              <Textarea
+                rows={2}
+                maxLength={200}
+                value={form.pauseMessage}
+                placeholder={DEFAULT_SETTINGS.pauseMessage}
+                onChange={(e) => set('pauseMessage', e.target.value)}
+              />
+            </Field>
+          )}
+        </Section>
+
+        <Section
+          icon={<IconMegaphone width={18} height={18} />}
+          tone="plum"
+          title="Announcement bar"
+          body="The thin line at the very top of every storefront page. Leave empty to show the cutoff reminder."
+        >
+          <Field
+            label="Message"
+            hint={`${form.announcement.length}/160 · e.g. a deal, a holiday note or a new product`}
+          >
+            <Input
+              value={form.announcement}
+              maxLength={160}
+              placeholder={defaultBar}
+              onChange={(e) => set('announcement', e.target.value)}
+            />
+          </Field>
+          <div>
+            <div className="mb-1.5 text-xs font-bold tracking-[0.1em] text-faint uppercase">Preview</div>
+            <div className="overflow-hidden rounded-2xl border border-line">
+              <div className="bg-forest-deep px-4 py-2 text-center text-[13px] text-[#E4EBDD]">
+                {form.ordersPaused ? (
+                  <strong className="font-semibold text-sage">
+                    {form.pauseMessage || DEFAULT_SETTINGS.pauseMessage}
+                  </strong>
+                ) : (
+                  form.announcement || defaultBar
+                )}
+              </div>
+              <div className="h-8 bg-cream" />
+            </div>
+          </div>
+        </Section>
+
+        <Section
+          icon={<IconClock width={18} height={18} />}
+          tone="green"
+          title="Ordering window"
+          body="When the nightly cutoff is and how far ahead customers can book."
+        >
+          <div className="flex items-start gap-3 rounded-2xl bg-forest px-4 py-3.5 text-sm text-white">
             <IconClock className="mt-0.5 shrink-0 text-sage" />
             <p>
               Orders placed before <strong className="text-sage">{formatHour(form.cutoffHour)}</strong> are
@@ -120,19 +211,25 @@ export function SettingsPage() {
               className="self-start"
             />
           </Field>
-          <Field label="Minimum order" hint="Use 0 for no minimum">
-            <PrefixInput
-              prefix="Rs"
-              type="number"
-              min={0}
-              value={form.minOrderPkr}
-              onChange={(e) => set('minOrderPkr', Number(e.target.value))}
-              className="sm:max-w-60"
-            />
-          </Field>
+          <div className="sm:max-w-60">
+            <Field label="Minimum order" hint="Use 0 for no minimum">
+              <PrefixInput
+                prefix="Rs"
+                type="number"
+                min={0}
+                value={form.minOrderPkr}
+                onChange={(e) => set('minOrderPkr', Number(e.target.value))}
+              />
+            </Field>
+          </div>
         </Section>
 
-        <Section title="Contact" body="Shown on the storefront and used for the WhatsApp order button.">
+        <Section
+          icon={<IconPhone width={18} height={18} />}
+          tone="sky"
+          title="Contact"
+          body="Shown on the storefront and used for the WhatsApp order button."
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="WhatsApp number" hint="Country code first, no plus: 923001234567">
               <PrefixInput
@@ -153,6 +250,8 @@ export function SettingsPage() {
         </Section>
 
         <Section
+          icon={<IconSettings width={18} height={18} />}
+          tone="gray"
           title="New-order alerts"
           body="Emails that get a message for every new order. Needs RESEND_API_KEY and a verified domain."
         >
@@ -161,7 +260,7 @@ export function SettingsPage() {
               {form.alertEmails.map((e) => (
                 <span
                   key={e}
-                  className="inline-flex items-center gap-1 rounded-lg bg-sage-soft py-1 pr-1 pl-2.5 text-sm font-medium text-forest"
+                  className="inline-flex items-center gap-1 rounded-full bg-sage-soft py-1 pr-1 pl-2.5 text-sm font-medium text-forest"
                 >
                   {e}
                   <button
@@ -173,7 +272,7 @@ export function SettingsPage() {
                         form.alertEmails.filter((x) => x !== e),
                       )
                     }
-                    className="grid h-5 w-5 place-items-center rounded hover:bg-forest hover:text-white"
+                    className="grid h-5 w-5 place-items-center rounded-full hover:bg-forest hover:text-white"
                   >
                     <IconX width={12} height={12} />
                   </button>
@@ -208,12 +307,27 @@ export function SettingsPage() {
   );
 }
 
-function Section({ title, body, children }: { title: string; body: string; children: ReactNode }) {
+function Section({
+  icon,
+  tone,
+  title,
+  body,
+  children,
+}: {
+  icon: ReactNode;
+  tone: Tone;
+  title: string;
+  body: string;
+  children: ReactNode;
+}) {
   return (
-    <section className="grid gap-5 rounded-2xl border border-line bg-white p-5 shadow-card lg:grid-cols-[260px_minmax(0,1fr)] lg:p-6">
-      <div>
-        <h2 className="text-lg font-semibold text-ink">{title}</h2>
-        <p className="mt-1 text-[13px] text-muted">{body}</p>
+    <section className="grid gap-5 rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card lg:grid-cols-[260px_minmax(0,1fr)] lg:p-6">
+      <div className="flex items-start gap-3">
+        <IconChip tone={tone}>{icon}</IconChip>
+        <div>
+          <h2 className="text-[15.5px] font-bold text-ink">{title}</h2>
+          <p className="mt-1 text-[13px] text-muted">{body}</p>
+        </div>
       </div>
       <div className="flex min-w-0 flex-col gap-4">{children}</div>
     </section>

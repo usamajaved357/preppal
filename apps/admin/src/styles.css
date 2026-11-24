@@ -97,7 +97,9 @@
   .pill-active {
     background-image: linear-gradient(135deg, #1f4d3a 0%, #3c7655 60%, #6f9a55 100%);
     color: white;
-    box-shadow: 0 4px 12px -4px rgb(31 77 58 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.15);
+    box-shadow:
+      0 4px 12px -4px rgb(31 77 58 / 0.55),
+      inset 0 1px 0 rgb(255 255 255 / 0.15);
   }
   /* Gentle brand wash at the top of hero cards. */
   .hero-wash {

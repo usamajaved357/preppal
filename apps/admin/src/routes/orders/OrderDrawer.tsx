@@ -39,7 +39,7 @@ export function OrderDrawer({ order, onClose }: { order: AdminOrder; onClose: ()
       header={
         <>
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-2xl font-semibold text-forest">{order.number}</h2>
+            <h2 className="text-xl font-bold text-ink">{order.number}</h2>
             <Badge tone={STATUS_TONE[order.status]} dot>
               {ORDER_STATUS_LABEL[order.status]}
             </Badge>
@@ -190,7 +190,7 @@ export function OrderDrawer({ order, onClose }: { order: AdminOrder; onClose: ()
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-line bg-white p-4 shadow-card">
+    <section className="rounded-2xl border border-line bg-surface p-4 shadow-card">
       <h3 className="mb-2.5 font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-gold">
         {title}
       </h3>

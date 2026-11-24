@@ -55,9 +55,24 @@ admin (a separate origin) showed broken images. `apps/admin/public/images` is a 
 it in dev and copies the real files into `dist` on build (verified). No duplicate files in git, no extra Worker code.
 Once all photos are R2 uploads (`/api/img/…`) the symlink can go. Windows checkouts need `git config core.symlinks true`.
 
-## ADR-012 — Admin UI patterns · 2026-11-24 · Accepted
-One way to do each thing so pages feel consistent: success/error feedback is a **toast** (`useFeedback().toast`),
-destructive steps use the **confirm dialog** (never `window.confirm`), multi-field edit pages show the sticky
-**SaveBar** when dirty (Product edit, Inventory "Save all", Settings), small create/edit forms open in a **Modal**
-(areas, admins, riders), and order details open in a **Drawer** so the board stays in view. Order rows show one
-primary "next step" button; less common/negative steps live in the drawer.
+## ADR-012 — Admin UI patterns · 2026-11-24 · Accepted (revised same day for v2 design)
+One way to do each thing: success/error feedback is a **toast**; destructive steps use the **confirm dialog**
+(never `window.confirm`); row actions live in a **"⋯" RowMenu** (Edit, Duplicate, Hide, Delete); multi-field edit
+pages show the sticky **SaveBar** when dirty; create/edit forms open in a **Modal** with a summary footer; order
+details open in a **Drawer**. Lists show one primary "next step" button per row. Visual language in DESIGN.md.
+
+## ADR-013 — What can be deleted · 2026-11-24 · Accepted
+Hard deletes, with guards where history depends on the row (logic in `apps/api/src/services/admin.ts`):
+- **Products / sizes**: always deletable (inventory rows go too). `order_items` keeps name/size/price snapshots and has
+  no FK to products, so past orders and prep lists are unaffected. Prefer Draft/Archived to hide temporarily.
+- **Categories**: deletable when empty; otherwise `?moveTo=<categoryId>` moves the products in the same batch.
+- **Delivery areas / riders**: blocked (409 `*_in_use`) once they appear on an order (orders FK them) — switch them off.
+- **Cities** (owner): only with no areas and no orders. **Admins** (owner): never yourself, never the last active owner.
+- Orders are never deleted — cancel them (restocks).
+Uploaded R2 images are not removed on delete (cheap, and an image may be reused); a cleanup job can come later.
+
+## ADR-014 — Storefront controls live in settings · 2026-11-24 · Accepted
+`announcement`, `ordersPaused` and `pauseMessage` are extra keys in the key/value `settings` table (no migration;
+`loadSettings` merges defaults so old rows still parse — see `schemas.test.ts`). `GET /settings` exposes them plus
+`cityNames`; the storefront top bar, hero, trust strip and checkout read them. `createOrder` refuses with
+409 `orders_paused` while paused, so the pause also holds against stale tabs.
