@@ -141,3 +141,61 @@ export const IconEdit = icon(
     <path d="M13.5 6.5l4 4" />
   </>,
 );
+export const IconDots = icon(
+  <>
+    <circle cx="5" cy="12" r="1.4" fill="currentColor" />
+    <circle cx="12" cy="12" r="1.4" fill="currentColor" />
+    <circle cx="19" cy="12" r="1.4" fill="currentColor" />
+  </>,
+);
+export const IconTrash = icon(
+  <>
+    <path d="M4 7h16M10 11v6M14 11v6" />
+    <path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+  </>,
+);
+export const IconTag = icon(
+  <>
+    <path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z" />
+    <circle cx="8" cy="8" r="1.6" />
+  </>,
+);
+export const IconCopy = icon(
+  <>
+    <rect x="8" y="8" width="13" height="13" rx="2" />
+    <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
+  </>,
+);
+export const IconMegaphone = icon(
+  <>
+    <path d="M3 10v4a1 1 0 0 0 1 1h2l5 4V5L6 9H4a1 1 0 0 0-1 1z" />
+    <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
+  </>,
+);
+export const IconPause = icon(
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M10 9v6M14 9v6" />
+  </>,
+);
+export const IconBuilding = icon(
+  <>
+    <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M2 21h20" />
+    <path d="M8 8h3M8 12h3M8 16h3" />
+  </>,
+);
+export const IconGrid = icon(
+  <>
+    <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+    <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+    <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+    <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+  </>,
+);
+export const IconArrowUpRight = icon(<path d="M7 17L17 7M8 7h9v9" />);
+export const IconSun = icon(
+  <>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+  </>,
+);

@@ -45,6 +45,9 @@ export const trackOrderSchema = z.object({
 
 // ───────────── Admin ─────────────
 
+/** DELETE /admin/categories/:id?moveTo= — products in the category move to `moveTo` first. */
+export const categoryDeleteQuerySchema = z.object({ moveTo: z.string().min(1).optional() });
+
 export const categoryInputSchema = z.object({
   name: z.string().trim().min(2).max(60),
   slug,
@@ -115,6 +118,9 @@ export const settingsSchema = z.object({
   whatsappNumber: z.string().regex(/^92\d{10}$/, 'Use 92XXXXXXXXXX'),
   instagramHandle: z.string().max(40),
   alertEmails: z.array(z.string().email()).max(10).default([]),
+  announcement: z.string().trim().max(160).default(''),
+  ordersPaused: z.boolean().default(false),
+  pauseMessage: z.string().trim().max(200).default(''),
 });
 export type Settings = z.infer<typeof settingsSchema>;
 

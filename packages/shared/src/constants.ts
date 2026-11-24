@@ -13,6 +13,11 @@ export const DEFAULT_SETTINGS = {
   minOrderPkr: 0,
   whatsappNumber: '923285228505',
   instagramHandle: 'preppal.swl',
+  /** Optional line shown in the storefront's top bar (empty = the default cutoff message). */
+  announcement: '',
+  /** Temporarily stop new orders (holidays, stock-outs). Checkout shows `pauseMessage`. */
+  ordersPaused: false,
+  pauseMessage: "We're taking a short break. Ordering opens again soon — message us on WhatsApp.",
 } as const;
 
 export const ROLES = ['owner', 'staff', 'rider'] as const;

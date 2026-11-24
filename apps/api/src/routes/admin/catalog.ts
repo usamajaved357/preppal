@@ -1,5 +1,10 @@
 import { categories, cities, inventory, products, productVariants } from '@preppal/db';
-import { categoryInputSchema, productInputSchema, variantInputSchema } from '@preppal/shared';
+import {
+  categoryDeleteQuerySchema,
+  categoryInputSchema,
+  productInputSchema,
+  variantInputSchema,
+} from '@preppal/shared';
 import { asc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import type { AppEnv } from '../../env';
@@ -8,12 +13,19 @@ import { notFound } from '../../lib/errors';
 import { newId, nowIso } from '../../lib/ids';
 import { imageUrl } from '../../lib/images';
 import { validate } from '../../lib/validate';
+import { deleteCategory, deleteProduct, deleteVariant, productCountByCategory } from '../../services/admin';
 
 export const adminCatalogRoutes = new Hono<AppEnv>()
   // ── Categories ──
   .get('/categories', async (c) => {
-    const rows = await c.get('db').select().from(categories).orderBy(asc(categories.sortOrder));
-    return c.json(rows.map((r) => ({ ...r, imageUrl: imageUrl(r.imageKey) })));
+    const db = c.get('db');
+    const [rows, counts] = await Promise.all([
+      db.select().from(categories).orderBy(asc(categories.sortOrder)),
+      productCountByCategory(db),
+    ]);
+    return c.json(
+      rows.map((r) => ({ ...r, imageUrl: imageUrl(r.imageKey), productCount: counts.get(r.id) ?? 0 })),
+    );
   })
   .post('/categories', validate('json', categoryInputSchema), async (c) => {
     const id = newId('cat');
@@ -29,6 +41,13 @@ export const adminCatalogRoutes = new Hono<AppEnv>()
     await c.get('db').update(categories).set(c.req.valid('json')).where(eq(categories.id, id));
     await audit(c, 'category.update', 'category', id);
     return c.json({ ok: true });
+  })
+  .delete('/categories/:id', validate('query', categoryDeleteQuerySchema), async (c) => {
+    const id = c.req.param('id');
+    const { moveTo } = c.req.valid('query');
+    const res = await deleteCategory(c.get('db'), id, moveTo);
+    await audit(c, 'category.delete', 'category', id, { moveTo, ...res });
+    return c.json({ ok: true, ...res });
   })
 
   // ── Products ──
@@ -77,6 +96,12 @@ export const adminCatalogRoutes = new Hono<AppEnv>()
     await audit(c, 'product.update', 'product', id);
     return c.json({ ok: true });
   })
+  .delete('/products/:id', async (c) => {
+    const id = c.req.param('id');
+    await deleteProduct(c.get('db'), id);
+    await audit(c, 'product.delete', 'product', id);
+    return c.json({ ok: true });
+  })
 
   // ── Variants ── (new variants are made available in every active city with no stock tracking)
   .post('/products/:id/variants', validate('json', variantInputSchema), async (c) => {
@@ -98,5 +123,11 @@ export const adminCatalogRoutes = new Hono<AppEnv>()
     const id = c.req.param('id');
     await c.get('db').update(productVariants).set(c.req.valid('json')).where(eq(productVariants.id, id));
     await audit(c, 'variant.update', 'variant', id, c.req.valid('json'));
+    return c.json({ ok: true });
+  })
+  .delete('/variants/:id', async (c) => {
+    const id = c.req.param('id');
+    await deleteVariant(c.get('db'), id);
+    await audit(c, 'variant.delete', 'variant', id);
     return c.json({ ok: true });
   });

@@ -1,5 +1,5 @@
 import { cities, deliveryAreas } from '@preppal/db';
-import { availableDeliveryDates, msUntilCutoff, type PublicSettingsDto } from '@preppal/shared';
+import { availableDeliveryDates, DEFAULT_SETTINGS, msUntilCutoff, type PublicSettingsDto } from '@preppal/shared';
 import { and, asc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { z } from 'zod';
@@ -12,7 +12,11 @@ const cityQuery = z.object({ city: z.string().default('sahiwal'), category: z.st
 
 export const catalogRoutes = new Hono<AppEnv>()
   .get('/settings', async (c) => {
-    const s = await loadSettings(c.get('db'));
+    const db = c.get('db');
+    const [s, activeCities] = await Promise.all([
+      loadSettings(db),
+      db.select({ name: cities.name }).from(cities).where(eq(cities.isActive, true)),
+    ]);
     const body: PublicSettingsDto = {
       cutoffHour: s.cutoffHour,
       deliveryByLabel: s.deliveryByLabel,
@@ -21,6 +25,10 @@ export const catalogRoutes = new Hono<AppEnv>()
       instagramHandle: s.instagramHandle,
       deliveryDates: availableDeliveryDates({ cutoffHour: s.cutoffHour, maxDaysAhead: s.maxDaysAhead }),
       msUntilCutoff: msUntilCutoff(s.cutoffHour),
+      announcement: s.announcement,
+      ordersPaused: s.ordersPaused,
+      pauseMessage: s.pauseMessage || DEFAULT_SETTINGS.pauseMessage,
+      cityNames: activeCities.map((x) => x.name),
     };
     c.header('Cache-Control', 'no-store');
     return c.json(body);

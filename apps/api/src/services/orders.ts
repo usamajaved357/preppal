@@ -45,6 +45,9 @@ export async function createOrder(
   now: Date = new Date(),
 ): Promise<{ created: OrderCreatedDto; alert: NewOrderAlert; alertEmails: string[] }> {
   const s = await loadSettings(db);
+  if (s.ordersPaused) {
+    throw new HttpError(409, 'orders_paused', s.pauseMessage || 'Ordering is paused right now');
+  }
 
   const dates = availableDeliveryDates({ now, cutoffHour: s.cutoffHour, maxDaysAhead: s.maxDaysAhead });
   if (!dates.includes(input.deliveryDate)) {

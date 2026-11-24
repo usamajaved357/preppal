@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
-/* Preppal design tokens — see docs/DESIGN.md. Change here, not in components. */
+/* Preppal design tokens — see docs/DESIGN.md ("Admin panel"). Change here, not in components. */
 @theme {
+  /* Brand */
   --color-forest: #1f4d3a;
   --color-forest-deep: #163a2c;
   --color-sage: #c8db8a;
@@ -9,39 +10,46 @@
   --color-cream: #faf7f1;
   --color-cream-btn: #f6f1e4;
   --color-sand: #f1ece1;
-  --color-ink: #1b2a22;
-  --color-muted: #5c6a61;
-  --color-line: #ece6da;
   --color-terra: #c4572a;
   --color-gold: #8a6a2e;
 
-  /* Admin-only tokens */
-  --color-canvas: #f7f4ec; /* admin page background */
-  --color-line-strong: #d7d0c1; /* input borders */
-  --color-nav-text: #d7e2d6; /* sidebar text */
-  --color-nav-muted: #a9bfaf; /* sidebar secondary text */
+  /* Admin surfaces (light, airy "app" look) */
+  --color-canvas: #f3f5f1; /* page behind the workspace panel */
+  --color-surface: #ffffff;
+  --color-subtle: #f7f8f5; /* table headers, footers, hover rows */
+  --color-ink: #14201a; /* text + dark pill buttons */
+  --color-ink-soft: #2b3a32;
+  --color-muted: #5f6c64;
+  --color-faint: #8b968f;
+  --color-line: #e5e8e2;
+  --color-line-strong: #d3d8d0;
+
+  /* Tints for icon chips, badges and statuses (soft background + readable ink) */
   --color-terra-soft: #fbeae3;
-  --color-terra-ink: #7a2e12;
-  /* Order status tones (soft background + readable ink) */
-  --color-amber-soft: #fdf1d6;
-  --color-amber-ink: #7a4b07;
-  --color-sky-soft: #e3edf7;
-  --color-sky-ink: #1f4a73;
-  --color-plum-soft: #eee8f6;
-  --color-plum-ink: #533780;
-  --color-clay-soft: #fbe6d6;
-  --color-clay-ink: #7c3510;
-  --color-stone-soft: #efede8;
+  --color-terra-ink: #9a3a14;
+  --color-amber-soft: #fdf1d8;
+  --color-amber-ink: #8a5300;
+  --color-sky-soft: #e5effa;
+  --color-sky-ink: #1f5288;
+  --color-plum-soft: #f0eafa;
+  --color-plum-ink: #5b3a90;
+  --color-clay-soft: #fcebdf;
+  --color-clay-ink: #8a3d12;
+  --color-rose-soft: #fde8ec;
+  --color-rose-ink: #a1243f;
+  --color-stone-soft: #eef0ec;
 
   --font-display: "Fraunces", Georgia, serif;
-  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-sans: "DM Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
 
-  --shadow-card: 0 1px 2px rgb(27 42 34 / 0.04), 0 1px 1px rgb(27 42 34 / 0.03);
-  --shadow-pop: 0 12px 32px -8px rgb(27 42 34 / 0.22), 0 2px 6px rgb(27 42 34 / 0.08);
+  --radius-card: 20px;
+  --shadow-card: 0 1px 2px rgb(20 32 26 / 0.04), 0 4px 14px -8px rgb(20 32 26 / 0.08);
+  --shadow-pop: 0 18px 40px -14px rgb(20 32 26 / 0.3), 0 2px 6px rgb(20 32 26 / 0.06);
+  --shadow-pill: 0 1px 2px rgb(20 32 26 / 0.2), inset 0 1px 0 rgb(255 255 255 / 0.08);
 
   --animate-rise: rise 0.22s ease-out both;
   --animate-slide-in: slide-in 0.26s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  --animate-fade: fade 0.2s ease-out both;
+  --animate-fade: fade 0.18s ease-out both;
 }
 
 @keyframes rise {
@@ -73,15 +81,29 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
   :focus-visible {
-    outline: 3px solid var(--color-sage);
+    outline: 3px solid color-mix(in srgb, var(--color-forest) 35%, transparent);
     outline-offset: 2px;
   }
   input[type="number"]::-webkit-inner-spin-button {
     opacity: 0.4;
+  }
+}
+
+@layer components {
+  /* Active pill in segmented tabs: brand gradient with a soft glow. */
+  .pill-active {
+    background-image: linear-gradient(135deg, #1f4d3a 0%, #3c7655 60%, #6f9a55 100%);
+    color: white;
+    box-shadow: 0 4px 12px -4px rgb(31 77 58 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.15);
+  }
+  /* Gentle brand wash at the top of hero cards. */
+  .hero-wash {
+    background-image:
+      radial-gradient(120% 140% at 0% 0%, rgb(200 219 138 / 0.28) 0%, transparent 55%),
+      radial-gradient(90% 120% at 100% 0%, rgb(196 87 42 / 0.08) 0%, transparent 50%);
   }
 }
 
@@ -94,12 +116,13 @@
   [data-print-hide] {
     display: none !important;
   }
+  [data-print-frame] {
+    border: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
   html[data-print="prep"] [data-print-section]:not([data-print-section="prep"]) {
     display: none !important;
-  }
-  html[data-print="prep"] [data-print-section="prep"] {
-    border: 0;
-    box-shadow: none;
   }
 }
 

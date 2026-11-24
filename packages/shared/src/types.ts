@@ -63,6 +63,13 @@ export interface PublicSettingsDto {
   instagramHandle: string;
   deliveryDates: string[];
   msUntilCutoff: number;
+  /** Admin-set top-bar message ('' = default cutoff line). */
+  announcement: string;
+  /** When true, checkout is closed and `pauseMessage` is shown. */
+  ordersPaused: boolean;
+  pauseMessage: string;
+  /** Names of active delivery cities, e.g. ["Sahiwal"]. */
+  cityNames: string[];
 }
 
 export interface OrderCreatedDto {

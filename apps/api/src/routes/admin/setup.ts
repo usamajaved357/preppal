@@ -14,6 +14,14 @@ import { HttpError } from '../../lib/errors';
 import { newId } from '../../lib/ids';
 import { loadSettings, saveSettings } from '../../lib/settings';
 import { validate } from '../../lib/validate';
+import {
+  areaCountByCity,
+  deleteAdmin,
+  deleteArea,
+  deleteCity,
+  deleteRider,
+  orderCountByArea,
+} from '../../services/admin';
 
 const ownerOnly = (role: string) => {
   if (role !== 'owner') throw new HttpError(403, 'forbidden', 'Only the owner can do this');
@@ -24,7 +32,11 @@ export const adminSetupRoutes = new Hono<AppEnv>()
   .get('/me', (c) => c.json(c.get('admin')))
 
   // ── Cities & areas ──
-  .get('/cities', async (c) => c.json(await c.get('db').select().from(cities)))
+  .get('/cities', async (c) => {
+    const db = c.get('db');
+    const [rows, counts] = await Promise.all([db.select().from(cities), areaCountByCity(db)]);
+    return c.json(rows.map((r) => ({ ...r, areaCount: counts.get(r.id) ?? 0 })));
+  })
   .post('/cities', validate('json', cityInputSchema), async (c) => {
     ownerOnly(c.get('admin').role);
     const id = newId('city');
@@ -42,11 +54,23 @@ export const adminSetupRoutes = new Hono<AppEnv>()
       .update(cities)
       .set(c.req.valid('json'))
       .where(eq(cities.id, c.req.param('id')));
+    await audit(c, 'city.update', 'city', c.req.param('id'));
     return c.json({ ok: true });
   })
-  .get('/areas', async (c) =>
-    c.json(await c.get('db').select().from(deliveryAreas).orderBy(asc(deliveryAreas.sortOrder))),
-  )
+  .delete('/cities/:id', async (c) => {
+    ownerOnly(c.get('admin').role);
+    await deleteCity(c.get('db'), c.req.param('id'));
+    await audit(c, 'city.delete', 'city', c.req.param('id'));
+    return c.json({ ok: true });
+  })
+  .get('/areas', async (c) => {
+    const db = c.get('db');
+    const [rows, counts] = await Promise.all([
+      db.select().from(deliveryAreas).orderBy(asc(deliveryAreas.sortOrder)),
+      orderCountByArea(db),
+    ]);
+    return c.json(rows.map((r) => ({ ...r, orderCount: counts.get(r.id) ?? 0 })));
+  })
   .post('/areas', validate('json', areaInputSchema), async (c) => {
     const id = newId('area');
     await c
@@ -65,6 +89,11 @@ export const adminSetupRoutes = new Hono<AppEnv>()
     await audit(c, 'area.update', 'area', c.req.param('id'));
     return c.json({ ok: true });
   })
+  .delete('/areas/:id', async (c) => {
+    await deleteArea(c.get('db'), c.req.param('id'));
+    await audit(c, 'area.delete', 'area', c.req.param('id'));
+    return c.json({ ok: true });
+  })
 
   // ── Riders ──
   .post('/riders', validate('json', riderInputSchema), async (c) => {
@@ -73,6 +102,7 @@ export const adminSetupRoutes = new Hono<AppEnv>()
       .get('db')
       .insert(riders)
       .values({ id, ...c.req.valid('json') });
+    await audit(c, 'rider.create', 'rider', id);
     return c.json({ id }, 201);
   })
   .put('/riders/:id', validate('json', riderInputSchema), async (c) => {
@@ -81,6 +111,12 @@ export const adminSetupRoutes = new Hono<AppEnv>()
       .update(riders)
       .set(c.req.valid('json'))
       .where(eq(riders.id, c.req.param('id')));
+    await audit(c, 'rider.update', 'rider', c.req.param('id'));
+    return c.json({ ok: true });
+  })
+  .delete('/riders/:id', async (c) => {
+    await deleteRider(c.get('db'), c.req.param('id'));
+    await audit(c, 'rider.delete', 'rider', c.req.param('id'));
     return c.json({ ok: true });
   })
 
@@ -106,6 +142,13 @@ export const adminSetupRoutes = new Hono<AppEnv>()
       .update(adminUsers)
       .set(c.req.valid('json'))
       .where(eq(adminUsers.id, c.req.param('id')));
+    await audit(c, 'admin.update', 'admin', c.req.param('id'));
+    return c.json({ ok: true });
+  })
+  .delete('/admins/:id', async (c) => {
+    ownerOnly(c.get('admin').role);
+    await deleteAdmin(c.get('db'), c.req.param('id'), c.get('admin').email);
+    await audit(c, 'admin.delete', 'admin', c.req.param('id'));
     return c.json({ ok: true });
   })
 

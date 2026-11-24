@@ -13,6 +13,7 @@ import { audit } from '../../lib/audit';
 import { HttpError, notFound } from '../../lib/errors';
 import { newId, nowIso } from '../../lib/ids';
 import { validate } from '../../lib/validate';
+import { orderCountByRider } from '../../services/admin';
 import { restockOrder } from '../../services/orders';
 
 const listQuery = z.object({
@@ -134,4 +135,8 @@ export const adminOrderRoutes = new Hono<AppEnv>()
       return c.json(rows);
     },
   )
-  .get('/riders', async (c) => c.json(await c.get('db').select().from(riders)));
+  .get('/riders', async (c) => {
+    const db = c.get('db');
+    const [rows, counts] = await Promise.all([db.select().from(riders), orderCountByRider(db)]);
+    return c.json(rows.map((r) => ({ ...r, orderCount: counts.get(r.id) ?? 0 })));
+  });

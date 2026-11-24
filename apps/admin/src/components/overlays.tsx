@@ -1,5 +1,5 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { IconAlert, IconCheck, IconX } from './icons';
+import { IconAlert, IconCheck, IconDots, IconX } from './icons';
 import { Button, IconButton } from './ui';
 
 // ───────────── Toasts + confirm dialog (one provider) ─────────────
@@ -52,15 +52,15 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       {children}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-4 z-[70] flex flex-col items-center gap-2 px-4"
+        className="pointer-events-none fixed inset-x-0 bottom-5 z-[70] flex flex-col items-center gap-2 px-4"
       >
         {toasts.map((t) => (
           <div
             key={t.id}
-            className="pointer-events-auto flex animate-rise items-center gap-2.5 rounded-xl bg-ink px-4 py-3 text-sm font-medium text-white shadow-pop"
+            className="pointer-events-auto flex animate-rise items-center gap-2.5 rounded-full bg-ink py-2.5 pr-5 pl-2.5 text-sm font-medium text-white shadow-pop"
           >
             <span
-              className={`grid h-5 w-5 place-items-center rounded-full ${t.tone === 'success' ? 'bg-sage text-forest-deep' : 'bg-terra text-white'}`}
+              className={`grid h-6 w-6 place-items-center rounded-full ${t.tone === 'success' ? 'bg-sage text-forest-deep' : 'bg-rose-ink text-white'}`}
             >
               {t.tone === 'success' ? (
                 <IconCheck width={13} height={13} strokeWidth={3} />
@@ -73,20 +73,25 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
         ))}
       </div>
       {pending && (
-        <Modal onClose={() => close(false)} title={pending.title} width="max-w-md">
-          {pending.body && <div className="text-sm text-muted">{pending.body}</div>}
-          <div className="mt-6 flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => close(false)}>
-              Keep it
-            </Button>
-            <Button
-              className={pending.danger ? 'bg-terra hover:bg-terra-ink' : ''}
-              onClick={() => close(true)}
-              autoFocus
-            >
-              {pending.confirmLabel ?? 'Confirm'}
-            </Button>
-          </div>
+        <Modal
+          onClose={() => close(false)}
+          title={pending.title}
+          width="max-w-md"
+          footer={
+            <>
+              <span />
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" onClick={() => close(false)}>
+                  Cancel
+                </Button>
+                <Button variant={pending.danger ? 'danger' : 'primary'} onClick={() => close(true)} autoFocus>
+                  {pending.confirmLabel ?? 'Confirm'}
+                </Button>
+              </div>
+            </>
+          }
+        >
+          {pending.body && <div className="text-sm leading-relaxed text-muted">{pending.body}</div>}
         </Modal>
       )}
     </FeedbackContext.Provider>
@@ -107,38 +112,49 @@ function useEscape(onClose: () => void) {
   }, [onClose]);
 }
 
+/**
+ * Dialog with a header (title + description), scrollable body and an optional footer bar.
+ * The footer is a flex row: put a summary on the left and actions on the right.
+ */
 export function Modal({
   title,
+  description,
   children,
+  footer,
   onClose,
   width = 'max-w-lg',
 }: {
   title: ReactNode;
+  description?: ReactNode;
   children: ReactNode;
+  footer?: ReactNode;
   onClose: () => void;
   width?: string;
 }) {
   useEscape(onClose);
   return (
-    <div className="fixed inset-0 z-[60] grid animate-fade place-items-center bg-ink/40 p-4 backdrop-blur-[2px]">
-      <button
-        type="button"
-        aria-label="Close"
-        className="absolute inset-0 cursor-default"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0 z-[60] grid animate-fade place-items-center bg-ink/35 p-3 backdrop-blur-[3px] sm:p-6">
+      <button type="button" aria-label="Close" className="absolute inset-0 cursor-default" onClick={onClose} />
       <div
         role="dialog"
         aria-modal="true"
-        className={`relative w-full ${width} animate-rise rounded-2xl bg-white p-6 shadow-pop`}
+        className={`relative flex max-h-full w-full ${width} animate-rise flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface shadow-pop`}
       >
-        <div className="mb-3 flex items-start justify-between gap-4">
-          <h2 className="text-xl font-semibold text-ink">{title}</h2>
-          <IconButton label="Close" onClick={onClose} className="-mt-1 -mr-2">
+        <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-3">
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-ink">{title}</h2>
+            {description && <p className="mt-0.5 text-[13px] text-muted">{description}</p>}
+          </div>
+          <IconButton label="Close" onClick={onClose} className="-mt-0.5 -mr-2">
             <IconX />
           </IconButton>
         </div>
-        {children}
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">{children}</div>
+        {footer && (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-subtle px-6 py-3.5">
+            {footer}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -157,26 +173,21 @@ export function Drawer({
 }) {
   useEscape(onClose);
   return (
-    <div className="fixed inset-0 z-50 animate-fade bg-ink/35" data-print-hide>
-      <button
-        type="button"
-        aria-label="Close"
-        className="absolute inset-0 cursor-default"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0 z-50 animate-fade bg-ink/30 backdrop-blur-[2px]" data-print-hide>
+      <button type="button" aria-label="Close" className="absolute inset-0 cursor-default" onClick={onClose} />
       <aside
         role="dialog"
         aria-modal="true"
-        className="absolute inset-y-0 right-0 flex w-full max-w-[520px] animate-slide-in flex-col bg-canvas shadow-pop"
+        className="absolute inset-y-2 right-2 flex w-[calc(100%-16px)] max-w-[520px] animate-slide-in flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-canvas shadow-pop"
       >
-        <div className="flex items-start justify-between gap-3 border-b border-line bg-white px-5 py-4">
+        <div className="flex items-start justify-between gap-3 border-b border-line bg-surface px-5 py-4">
           <div className="min-w-0 flex-1">{header}</div>
           <IconButton label="Close" onClick={onClose} className="-mr-2">
             <IconX />
           </IconButton>
         </div>
-        <div className="flex-1 overflow-y-auto p-5">{children}</div>
-        {footer && <div className="border-t border-line bg-white px-5 py-3.5">{footer}</div>}
+        <div className="flex-1 overflow-y-auto p-4">{children}</div>
+        {footer && <div className="border-t border-line bg-surface px-5 py-3.5">{footer}</div>}
       </aside>
     </div>
   );
@@ -201,26 +212,96 @@ export function SaveBar({
   if (!show) return null;
   return (
     <div className="pointer-events-none sticky bottom-4 z-30 mt-6 flex justify-center" data-print-hide>
-      <div className="pointer-events-auto flex w-full max-w-2xl animate-rise flex-wrap items-center justify-between gap-3 rounded-2xl bg-forest-deep px-4 py-3 text-white shadow-pop">
+      <div className="pointer-events-auto flex w-full max-w-xl animate-rise flex-wrap items-center justify-between gap-3 rounded-full bg-ink py-2 pr-2 pl-5 text-white shadow-pop">
         <span className="flex items-center gap-2 text-sm font-medium">
-          <span className="h-2 w-2 rounded-full bg-sage" />
+          <span className="h-2 w-2 animate-pulse rounded-full bg-sage" />
           {label}
         </span>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           {onDiscard && (
-            <Button
-              variant="ghost"
-              className="text-nav-text hover:bg-white/10 hover:text-white"
-              onClick={onDiscard}
-            >
+            <Button variant="ghost" className="text-white/70 hover:bg-white/10 hover:text-white" onClick={onDiscard}>
               Discard
             </Button>
           )}
-          <Button className="bg-cream-btn text-forest-deep hover:bg-white" onClick={onSave} disabled={saving}>
+          <Button className="bg-white !text-ink hover:bg-sage-soft" onClick={onSave} disabled={saving}>
             {saving ? 'Saving…' : saveLabel}
           </Button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ───────────── Row actions menu ─────────────
+export interface MenuItem {
+  label: string;
+  icon?: ReactNode;
+  onSelect: () => void;
+  danger?: boolean;
+  disabled?: boolean;
+  hint?: string;
+}
+
+/** "⋯" button that opens a small menu of row actions (Edit, Duplicate, Delete…). */
+export function RowMenu({ items, label = 'More actions' }: { items: MenuItem[]; label?: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <IconButton
+        label={label}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen(!open);
+        }}
+      >
+        <IconDots />
+      </IconButton>
+      {open && (
+        <div
+          role="menu"
+          className="absolute top-9 right-0 z-40 w-52 animate-rise overflow-hidden rounded-2xl border border-line bg-surface p-1.5 shadow-pop"
+        >
+          {items.map((it) => (
+            <button
+              key={it.label}
+              type="button"
+              role="menuitem"
+              disabled={it.disabled}
+              title={it.hint}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpen(false);
+                it.onSelect();
+              }}
+              className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-sm font-medium transition disabled:opacity-40 ${
+                it.danger ? 'text-rose-ink hover:bg-rose-soft' : 'text-ink hover:bg-subtle'
+              }`}
+            >
+              {it.icon && <span className="opacity-80">{it.icon}</span>}
+              {it.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
