@@ -1,9 +1,12 @@
 import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
 import { Shell } from './components/Shell';
 import { InventoryPage } from './routes/Inventory';
-import { OrdersPage } from './routes/Orders';
-import { ProductEditPage, ProductsPage } from './routes/Products';
-import { AreasPage, SettingsPage, TeamPage } from './routes/Setup';
+import { OrdersPage } from './routes/orders/OrdersPage';
+import { ProductEditPage } from './routes/products/ProductEditPage';
+import { ProductsPage } from './routes/products/ProductsPage';
+import { AreasPage } from './routes/setup/Areas';
+import { SettingsPage } from './routes/setup/Settings';
+import { TeamPage } from './routes/setup/Team';
 
 const root = createRootRoute({ component: Shell });
 

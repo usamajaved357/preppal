@@ -43,11 +43,31 @@ export interface AdminOrder {
   notes: string;
   deliveryDate: string;
   status: import('@preppal/shared').OrderStatus;
+  subtotalPkr: number;
+  deliveryFeePkr: number;
   totalPkr: number;
   codCollected: boolean;
   riderId: string | null;
   createdAt: string;
-  items: { id: string; productName: string; variantLabel: string; qty: number; lineTotalPkr: number }[];
+  items: {
+    id: string;
+    productName: string;
+    variantLabel: string;
+    qty: number;
+    unitPricePkr: number;
+    lineTotalPkr: number;
+  }[];
+}
+
+export interface AdminOrderDetail extends AdminOrder {
+  history: { id: string; status: string; note: string; byEmail: string | null; createdAt: string }[];
+}
+
+export interface AdminRider {
+  id: string;
+  name: string;
+  phone: string;
+  isActive: boolean;
 }
 
 export interface AdminVariant {

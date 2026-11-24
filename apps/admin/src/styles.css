@@ -15,13 +15,55 @@
   --color-terra: #c4572a;
   --color-gold: #8a6a2e;
 
+  /* Admin-only tokens */
+  --color-canvas: #f7f4ec; /* admin page background */
+  --color-line-strong: #d7d0c1; /* input borders */
+  --color-nav-text: #d7e2d6; /* sidebar text */
+  --color-nav-muted: #a9bfaf; /* sidebar secondary text */
+  --color-terra-soft: #fbeae3;
+  --color-terra-ink: #7a2e12;
+  /* Order status tones (soft background + readable ink) */
+  --color-amber-soft: #fdf1d6;
+  --color-amber-ink: #7a4b07;
+  --color-sky-soft: #e3edf7;
+  --color-sky-ink: #1f4a73;
+  --color-plum-soft: #eee8f6;
+  --color-plum-ink: #533780;
+  --color-clay-soft: #fbe6d6;
+  --color-clay-ink: #7c3510;
+  --color-stone-soft: #efede8;
+
   --font-display: "Fraunces", Georgia, serif;
   --font-sans: "DM Sans", system-ui, sans-serif;
+
+  --shadow-card: 0 1px 2px rgb(27 42 34 / 0.04), 0 1px 1px rgb(27 42 34 / 0.03);
+  --shadow-pop: 0 12px 32px -8px rgb(27 42 34 / 0.22), 0 2px 6px rgb(27 42 34 / 0.08);
+
+  --animate-rise: rise 0.22s ease-out both;
+  --animate-slide-in: slide-in 0.26s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-fade: fade 0.2s ease-out both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
 }
 
 @layer base {
   html {
-    background: var(--color-cream);
+    background: var(--color-canvas);
     color: var(--color-ink);
   }
   body {
@@ -37,6 +79,27 @@
   :focus-visible {
     outline: 3px solid var(--color-sage);
     outline-offset: 2px;
+  }
+  input[type="number"]::-webkit-inner-spin-button {
+    opacity: 0.4;
+  }
+}
+
+/* Printing: hide app chrome; "print prep list" hides everything but the prep list. */
+@media print {
+  html,
+  body {
+    background: white;
+  }
+  [data-print-hide] {
+    display: none !important;
+  }
+  html[data-print="prep"] [data-print-section]:not([data-print-section="prep"]) {
+    display: none !important;
+  }
+  html[data-print="prep"] [data-print-section="prep"] {
+    border: 0;
+    box-shadow: none;
   }
 }
 
